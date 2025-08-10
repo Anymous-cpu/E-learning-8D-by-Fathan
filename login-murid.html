@@ -104,18 +104,34 @@
             margin-top: 10px;
         }
         
+        .submit-btn:hover {
+            background: #4ca0d8;
+            transform: translateY(-2px);
+        }
+        
         .error-message {
             color: var(--error);
             font-size: 13px;
             margin-top: 5px;
             display: none;
         }
+        
+        /* Animation for error message */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        .shake {
+            animation: shake 0.5s;
+        }
     </style>
 </head>
 <body>
     <div class="login-container">
         <div class="logo">
-            <div class="logo-icon"></div>
+            <div class="logo-icon">👨‍🎓</div>
         </div>
         
         <h1>Login Murid</h1>
@@ -123,7 +139,7 @@
         
         <div class="form-group">
             <label for="student-name">Nama Lengkap</label>
-            <input type="text" id="student-name" class="form-control" placeholder="Contoh: Ahmad Budi">
+            <input type="text" id="student-name" class="form-control" placeholder="Contoh: Ahmad Budi" autocomplete="name">
             <div class="error-message" id="error-message">
                 Nama harus diisi!
             </div>
@@ -135,26 +151,50 @@
     </div>
 
     <script>
-        document.getElementById('login-btn').addEventListener('click', function() {
-            const studentName = document.getElementById('student-name').value.trim();
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginBtn = document.getElementById('login-btn');
+            const studentNameInput = document.getElementById('student-name');
+            const errorMessage = document.getElementById('error-message');
             
-            if (!studentName) {
-                document.getElementById('error-message').style.display = 'block';
-                return;
-            }
+            // Focus on input when page loads
+            studentNameInput.focus();
             
-            // Simpan nama siswa di localStorage
-            localStorage.setItem('current_student', studentName);
+            // Login button click handler
+            loginBtn.addEventListener('click', function() {
+                const studentName = studentNameInput.value.trim();
+                
+                if (!studentName) {
+                    errorMessage.style.display = 'block';
+                    loginContainer.classList.add('shake');
+                    setTimeout(() => {
+                        loginContainer.classList.remove('shake');
+                    }, 500);
+                    return;
+                }
+                
+                // Save student name to localStorage
+                localStorage.setItem('current_student', studentName + ' (8D)');
+                
+                // Redirect to dashboard (lowercase filename for GitHub Pages)
+                window.location.href = "dashboard.html";
+            });
             
-            // Redirect ke dashboard
-            window.location.href = "Dashboard.html";
-        });
-        
-        // Handle Enter key
-        document.getElementById('student-name').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                document.getElementById('login-btn').click();
-            }
+            // Handle Enter key
+            studentNameInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    loginBtn.click();
+                }
+            });
+            
+            // Hide error when typing
+            studentNameInput.addEventListener('input', function() {
+                if (errorMessage.style.display === 'block') {
+                    errorMessage.style.display = 'none';
+                }
+            });
+            
+            // Get the login container for shake animation
+            const loginContainer = document.querySelector('.login-container');
         });
     </script>
 </body>
