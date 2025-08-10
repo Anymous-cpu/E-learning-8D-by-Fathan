@@ -1,534 +1,203 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Buat Tugas | Guru</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap');
-        @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css');
-        
-        :root {
-            --primary: #5dadec;
-            --accent: #00f7ff;
-            --light: #e6f7ff;
-            --dark: #1a3a6a;
-            --glass: rgba(255, 255, 255, 0.15);
-            --neon-glow: 0 0 10px var(--accent);
-            --error: #ff6b6b;
-            --success: #2ecc71;
-            --warning: #f39c12;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Zen Kaku Gothic New', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #0a1a2e, #1a3a6a);
-            min-height: 100vh;
-            color: var(--light);
-            touch-action: manipulation;
-        }
-        
-        .navbar {
-            background: var(--glass);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 12px 15px;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-        
-        .logo-icon {
-            width: 36px;
-            height: 36px;
-            background: var(--primary);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 0 15px var(--primary), inset 0 0 5px white;
-        }
-        
-        .nav-links {
-            display: flex;
-            overflow-x: auto;
-            gap: 8px;
-            padding-bottom: 5px;
-            -webkit-overflow-scrolling: touch;
-        }
-        
-        .nav-link {
-            color: var(--light);
-            text-decoration: none;
-            font-size: 13px;
-            padding: 8px 12px;
-            border-radius: 20px;
-            transition: all 0.3s;
-            white-space: nowrap;
-            background: rgba(255, 255, 255, 0.05);
-        }
-        
-        .nav-link.active {
-            background: var(--primary);
-            box-shadow: var(--neon-glow);
-        }
-        
-        .container {
-            margin-top: 100px;
-            padding: 15px;
-            padding-bottom: 80px;
-        }
-        
-        .header-section {
-            background: var(--glass);
-            backdrop-filter: blur(12px);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        h1 {
-            font-size: 20px;
-            margin-bottom: 8px;
-        }
-        
-        .form-group {
-            background: var(--glass);
-            backdrop-filter: blur(12px);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .form-control {
-            margin-bottom: 15px;
-        }
-        
-        .form-control label {
-            display: block;
-            font-size: 13px;
-            margin-bottom: 5px;
-            opacity: 0.8;
-        }
-        
-        .form-control input,
-        .form-control select,
-        .form-control textarea {
-            width: 100%;
-            padding: 12px 15px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            color: white;
-            font-size: 14px;
-        }
-        
-        .form-control textarea {
-            min-height: 100px;
-            resize: vertical;
-        }
-        
-        .file-upload {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        
-        .file-upload-label {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 15px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px dashed rgba(255, 255, 255, 0.3);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .file-upload-label:hover {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: var(--accent);
-        }
-        
-        .file-upload-label i {
-            font-size: 20px;
-            color: var(--accent);
-        }
-        
-        .file-upload-input {
-            display: none;
-        }
-        
-        .file-list {
-            margin-top: 10px;
-        }
-        
-        .file-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 8px 12px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 6px;
-            margin-bottom: 5px;
-        }
-        
-        .file-name {
-            flex: 1;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        .file-remove {
-            color: var(--error);
-            background: none;
-            border: none;
-            cursor: pointer;
-            margin-left: 10px;
-        }
-        
-        .btn {
-            padding: 12px 20px;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.3s;
-            min-width: 80px;
-            text-align: center;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 4px 15px rgba(93, 173, 236, 0.3);
-        }
-        
-        .btn-primary:hover {
-            background: #4ca0d8;
-            transform: translateY(-2px);
-        }
-        
-        .btn-accent {
-            background: var(--accent);
-            color: var(--dark);
-            box-shadow: 0 4px 15px rgba(0, 247, 255, 0.3);
-        }
-        
-        .btn-accent:hover {
-            background: #00e6ee;
-            transform: translateY(-2px);
-        }
-        
-        .btn-danger {
-            background: var(--error);
-            color: white;
-            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
-        }
-        
-        .form-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        
-        .bg-elements {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            overflow: hidden;
-        }
-        
-        .bg-element {
-            position: absolute;
-            border-radius: 50%;
-            background: radial-gradient(circle, var(--primary), transparent 70%);
-            opacity: 0.1;
-            filter: blur(30px);
-        }
-        
-        .task-list {
-            display: grid;
-            gap: 15px;
-            margin-top: 25px;
-        }
-        
-        .task-card {
-            background: var(--glass);
-            backdrop-filter: blur(12px);
-            border-radius: 12px;
-            padding: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.3s;
-        }
-        
-        .task-card:hover {
-            border-color: var(--primary);
-            box-shadow: 0 5px 15px rgba(93, 173, 236, 0.2);
-        }
-        
-        .task-title {
-            font-weight: 500;
-            margin-bottom: 5px;
-        }
-        
-        .task-meta {
-            display: flex;
-            gap: 15px;
-            font-size: 12px;
-            opacity: 0.8;
-        }
-        
-        .no-tasks {
-            text-align: center;
-            padding: 30px;
-            opacity: 0.7;
-        }
-        
-        @media (max-width: 768px) {
-            .form-actions {
-                flex-direction: column;
-            }
-            
-            .btn {
-                width: 100%;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Buat Tugas | Guru</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css');
+:root {
+    --primary: #5dadec;
+    --accent: #00f7ff;
+    --light: #e6f7ff;
+    --dark: #1a3a6a;
+    --glass: rgba(255, 255, 255, 0.15);
+    --neon-glow: 0 0 10px var(--accent);
+    --error: #ff6b6b;
+}
+* {margin: 0;padding: 0;box-sizing: border-box;font-family: 'Zen Kaku Gothic New', sans-serif;}
+body {
+    background: linear-gradient(135deg, #0a1a2e, #1a3a6a);
+    min-height: 100vh;
+    color: var(--light);
+}
+.navbar {
+    background: var(--glass);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 12px 15px;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+}
+.logo {display: flex;align-items: center;gap: 10px;margin-bottom: 10px;}
+.logo-icon {
+    width: 36px;height: 36px;background: var(--primary);
+    border-radius: 50%;display: flex;justify-content: center;align-items: center;
+    box-shadow: 0 0 15px var(--primary), inset 0 0 5px white;
+}
+.nav-links {display: flex;overflow-x: auto;gap: 8px;padding-bottom: 5px;}
+.nav-link {
+    color: var(--light);text-decoration: none;font-size: 13px;
+    padding: 8px 12px;border-radius: 20px;transition: all 0.3s;
+    white-space: nowrap;background: rgba(255, 255, 255, 0.05);
+}
+.nav-link.active {background: var(--primary);box-shadow: var(--neon-glow);}
+.container {margin-top: 100px;padding: 15px;}
+.header-section {
+    background: var(--glass);backdrop-filter: blur(12px);
+    border-radius: 12px;padding: 15px;margin-bottom: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+h1 {font-size: 20px;margin-bottom: 8px;}
+.form-group {
+    background: var(--glass);backdrop-filter: blur(12px);
+    border-radius: 12px;padding: 15px;margin-bottom: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.form-control {margin-bottom: 15px;}
+.form-control label {
+    display: block;font-size: 13px;margin-bottom: 5px;opacity: 0.8;
+}
+.form-control input,
+.form-control textarea {
+    width: 100%;padding: 12px 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;color: white;font-size: 14px;
+}
+.form-control textarea {min-height: 100px;resize: vertical;}
+.btn {
+    padding: 12px 20px;border-radius: 8px;border: none;cursor: pointer;
+    font-size: 14px;font-weight: 500;transition: all 0.3s;min-width: 80px;
+    text-align: center;display: inline-flex;align-items: center;justify-content: center;gap: 8px;
+}
+.btn-primary {background: var(--primary);color: white;}
+.btn-primary:hover {background: #4ca0d8;}
+.btn-danger {background: var(--error);color: white;}
+.form-actions {display: flex;justify-content: flex-end;gap: 10px;margin-top: 20px;}
+.task-list {display: grid;gap: 15px;margin-top: 25px;}
+.task-card {
+    background: var(--glass);backdrop-filter: blur(12px);
+    border-radius: 12px;padding: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.task-title {font-weight: 500;margin-bottom: 5px;}
+.task-meta {display: flex;gap: 15px;font-size: 12px;opacity: 0.8;}
+.no-tasks {text-align: center;padding: 30px;opacity: 0.7;}
+</style>
 </head>
 <body>
-    <!-- Background Elements -->
-    <div class="bg-elements">
-        <div class="bg-element" style="width: 300px; height: 300px; top: -50px; left: -50px;"></div>
-        <div class="bg-element" style="width: 200px; height: 200px; bottom: -30px; right: -30px;"></div>
+<nav class="navbar">
+    <div class="logo">
+        <div class="logo-icon">ðŸ‘©â€ðŸ«</div>
+        <span class="logo-text">GURU KELAS 8D</span>
     </div>
-    
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="logo">
-            <div class="logo-icon">👩‍🏫</div>
-            <span class="logo-text">GURU KELAS 8D</span>
+    <div class="nav-links">
+        <a href="manajemen.html" class="nav-link">MANAJEMEN</a>
+        <a href="create-kuis.html" class="nav-link">BUAT KUIS</a>
+        <a href="create-tugas.html" class="nav-link active">BUAT TUGAS</a>
+        <a href="pengumuman.html" class="nav-link">PENGUMUMAN</a>
+        <a href="data-tugas.html" class="nav-link">DATA TUGAS</a>
+    </div>
+</nav>
+
+<div class="container">
+    <section class="header-section">
+        <h1>Buat Tugas Baru</h1>
+        <p>Isi form berikut untuk membuat tugas</p>
+    </section>
+
+    <div class="form-group">
+        <div class="form-control">
+            <label for="task-title">Judul Tugas</label>
+            <input type="text" id="task-title" placeholder="Misal: Tugas Matematika Bab Aljabar">
         </div>
-        <div class="nav-links">
-            <a href="manajemen.html" class="nav-link">MANAJEMEN</a>
-            <a href="create-kuis.html" class="nav-link">BUAT KUIS</a>
-            <a href="create-tugas.html" class="nav-link active">BUAT TUGAS</a>
-            <a href="pengumuman.html" class="nav-link">PENGUMUMAN</a>
-            <a href="data-tugas.html" class="nav-link">DATA TUGAS</a>
+        <div class="form-control">
+            <label for="task-desc">Deskripsi Tugas</label>
+            <textarea id="task-desc" rows="4" placeholder="Deskripsi detail tentang tugas ini"></textarea>
         </div>
-    </nav>
-    
-    <!-- Main Content -->
-    <div class="container">
-        <section class="header-section">
-            <h1>Buat Tugas Baru</h1>
-            <p>Isi form berikut untuk membuat tugas</p>
-        </section>
-        
-        <div class="form-group">
-            <div class="form-control">
-                <label for="task-title">Judul Tugas</label>
-                <input type="text" id="task-title" placeholder="Misal: Tugas Matematika Bab Aljabar">
-            </div>
-            <div class="form-control">
-                <label for="task-desc">Deskripsi Tugas</label>
-                <textarea id="task-desc" rows="4" placeholder="Deskripsi detail tentang tugas ini"></textarea>
-            </div>
-            <div class="form-control">
-                <label for="task-deadline">Batas Waktu Pengumpulan</label>
-                <input type="datetime-local" id="task-deadline">
-            </div>
-            <div class="form-control">
-                <label>Lampiran</label>
-                <div class="file-upload">
-                    <label for="file-upload-input" class="file-upload-label">
-                        <i class="fas fa-paperclip"></i>
-                        <span>Klik untuk mengunggah file</span>
-                    </label>
-                    <input type="file" id="file-upload-input" class="file-upload-input" multiple>
-                    <div class="file-list" id="file-list">
-                        <!-- Daftar file akan muncul di sini -->
-                    </div>
+        <div class="form-control">
+            <label for="task-deadline">Batas Waktu Pengumpulan</label>
+            <input type="datetime-local" id="task-deadline">
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <button class="btn btn-danger" id="cancel-task"><i class="fas fa-times"></i> Batal</button>
+        <button class="btn btn-primary" id="publish-task"><i class="fas fa-check"></i> Publikasikan Tugas</button>
+    </div>
+
+    <h2 style="margin: 25px 0 15px; font-size: 18px;">Tugas yang Telah Dibuat</h2>
+    <div class="task-list" id="published-tasks"></div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function saveTaskToStorage(task) {
+        let tasks = JSON.parse(localStorage.getItem('teacher_tasks')) || [];
+        tasks.push(task);
+        localStorage.setItem('teacher_tasks', JSON.stringify(tasks));
+    }
+    function getTasksFromStorage() {
+        return JSON.parse(localStorage.getItem('teacher_tasks')) || [];
+    }
+    function renderPublishedTasks() {
+        const tasks = getTasksFromStorage();
+        const container = document.getElementById('published-tasks');
+        if (tasks.length === 0) {
+            container.innerHTML = `
+                <div class="no-tasks">
+                    <i class="fas fa-info-circle"></i>
+                    <p>Belum ada tugas yang dibuat</p>
+                </div>
+            `;
+            return;
+        }
+        container.innerHTML = tasks.map(task => `
+            <div class="task-card">
+                <div class="task-title">${task.title}</div>
+                <div class="task-meta">
+                    <span>Batas: ${new Date(task.deadline).toLocaleString()}</span>
                 </div>
             </div>
-        </div>
-        
-        <div class="form-actions">
-            <button class="btn btn-danger" id="cancel-task">
-                <i class="fas fa-times"></i> Batal
-            </button>
-            <button class="btn btn-primary" id="publish-task">
-                <i class="fas fa-check"></i> Publikasikan Tugas
-            </button>
-        </div>
-        
-        <h2 style="margin: 25px 0 15px; font-size: 18px;">Tugas yang Telah Dibuat</h2>
-        <div class="task-list" id="published-tasks">
-            <!-- Daftar tugas akan muncul di sini -->
-        </div>
-    </div>
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Ukuran font dinamis
-            const baseFontSize = window.innerWidth < 400 ? 14 : 16;
-            document.documentElement.style.fontSize = baseFontSize + 'px';
-            
-            // Simpan tugas ke localStorage
-            function saveTaskToStorage(task) {
-                let tasks = JSON.parse(localStorage.getItem('teacher_tasks')) || [];
-                tasks.push(task);
-                localStorage.setItem('teacher_tasks', JSON.stringify(tasks));
-                localStorage.setItem('student_tasks', JSON.stringify(tasks));
-            }
-
-            // Ambil tugas dari localStorage
-            function getTasksFromStorage() {
-                return JSON.parse(localStorage.getItem('teacher_tasks')) || [];
-            }
-
-            // Render daftar tugas
-            function renderPublishedTasks() {
-                const tasks = getTasksFromStorage();
-                const container = document.getElementById('published-tasks');
-                
-                if (tasks.length === 0) {
-                    container.innerHTML = `
-                        <div class="no-tasks">
-                            <i class="fas fa-info-circle"></i>
-                            <p>Belum ada tugas yang dibuat</p>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                container.innerHTML = tasks.map(task => `
-                    <div class="task-card">
-                        <div class="task-title">${task.title}</div>
-                        <div class="task-meta">
-                            <span>Batas: ${new Date(task.deadline).toLocaleString()}</span>
-                            <span>${task.files.length} Lampiran</span>
-                        </div>
-                    </div>
-                `).join('');
-            }
-
-            // Inisialisasi render
-            renderPublishedTasks();
-
-            // Handle file upload
-            const fileInput = document.getElementById('file-upload-input');
-            const fileList = document.getElementById('file-list');
-            let uploadedFiles = [];
-            
-            fileInput.addEventListener('change', function(e) {
-                const files = Array.from(e.target.files);
-                files.forEach(file => {
-                    uploadedFiles.push(file);
-                    
-                    const fileItem = document.createElement('div');
-                    fileItem.className = 'file-item';
-                    fileItem.innerHTML = `
-                        <span class="file-name">${file.name}</span>
-                        <button class="file-remove" data-name="${file.name}">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    `;
-                    
-                    fileList.appendChild(fileItem);
-                    
-                    // Add event listener to remove button
-                    fileItem.querySelector('.file-remove').addEventListener('click', function() {
-                        const fileName = this.getAttribute('data-name');
-                        uploadedFiles = uploadedFiles.filter(f => f.name !== fileName);
-                        fileList.removeChild(fileItem);
-                    });
-                });
-                
-                // Reset input to allow selecting same files again
-                fileInput.value = '';
-            });
-
-            // Publish task
-            document.getElementById('publish-task').addEventListener('click', function() {
-                const taskTitle = document.getElementById('task-title').value;
-                const taskDesc = document.getElementById('task-desc').value;
-                const taskDeadline = document.getElementById('task-deadline').value;
-                
-                if (!taskTitle) {
-                    alert('Judul tugas harus diisi!');
-                    return;
-                }
-                
-                if (!taskDeadline) {
-                    alert('Batas waktu harus diisi!');
-                    return;
-                }
-                
-                const newTask = {
-                    id: Date.now().toString(),
-                    title: taskTitle,
-                    description: taskDesc,
-                    deadline: taskDeadline,
-                    createdAt: new Date().toISOString(),
-                    files: uploadedFiles.map(file => ({
-                        name: file.name,
-                        size: file.size,
-                        type: file.type
-                    }))
-                };
-                
-                saveTaskToStorage(newTask);
-                alert('Tugas berhasil dipublikasikan!');
-                renderPublishedTasks();
-                
-                // Reset form
-                document.getElementById('task-title').value = '';
-                document.getElementById('task-desc').value = '';
-                document.getElementById('task-deadline').value = '';
-                fileList.innerHTML = '';
-                uploadedFiles = [];
-            });
-
-            // Cancel task
-            document.getElementById('cancel-task').addEventListener('click', function() {
-                if (confirm('Apakah Anda yakin ingin membatalkan? Semua perubahan akan hilang.')) {
-                    document.getElementById('task-title').value = '';
-                    document.getElementById('task-desc').value = '';
-                    document.getElementById('task-deadline').value = '';
-                    fileList.innerHTML = '';
-                    uploadedFiles = [];
-                }
-            });
-        });
-    </script>
+        `).join('');
+    }
+    renderPublishedTasks();
+    document.getElementById('publish-task').addEventListener('click', function() {
+        const title = document.getElementById('task-title').value;
+        const desc = document.getElementById('task-desc').value;
+        const deadline = document.getElementById('task-deadline').value;
+        if (!title || !deadline) {
+            alert('Judul dan batas waktu wajib diisi!');
+            return;
+        }
+        const newTask = {
+            id: Date.now().toString(),
+            title: title,
+            description: desc,
+            deadline: deadline,
+            createdAt: new Date().toISOString()
+        };
+        saveTaskToStorage(newTask);
+        alert('Tugas berhasil dipublikasikan!');
+        renderPublishedTasks();
+        document.getElementById('task-title').value = '';
+        document.getElementById('task-desc').value = '';
+        document.getElementById('task-deadline').value = '';
+    });
+    document.getElementById('cancel-task').addEventListener('click', function() {
+        if (confirm('Batalkan pembuatan tugas?')) {
+            document.getElementById('task-title').value = '';
+            document.getElementById('task-desc').value = '';
+            document.getElementById('task-deadline').value = '';
+        }
+    });
+});
+</script>
 </body>
 </html>
