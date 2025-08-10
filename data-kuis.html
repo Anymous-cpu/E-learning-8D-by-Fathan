@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Data Kuis 8D | Guru</title>
+    <title>Data Kuis | Guru</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap');
-        @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css');
         
         :root {
             --primary: #5dadec;
@@ -18,9 +17,6 @@
             --error: #ff6b6b;
             --success: #2ecc71;
             --warning: #f39c12;
-            --gold: #FFD700;
-            --silver: #C0C0C0;
-            --bronze: #CD7F32;
         }
         
         * {
@@ -35,6 +31,7 @@
             background: linear-gradient(135deg, #0a1a2e, #1a3a6a);
             min-height: 100vh;
             color: var(--light);
+            perspective: 1000px;
             touch-action: manipulation;
         }
         
@@ -43,12 +40,12 @@
             backdrop-filter: blur(12px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.2);
             padding: 12px 15px;
+            display: flex;
+            flex-direction: column;
             position: fixed;
             width: 100%;
             top: 0;
             z-index: 100;
-            display: flex;
-            flex-direction: column;
         }
         
         .logo {
@@ -66,7 +63,15 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 0 15px var(--primary), inset 0 0 5px white;
+            box-shadow: 
+                0 0 15px var(--primary),
+                inset 0 0 5px white;
+        }
+        
+        .logo-text {
+            font-weight: 500;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            font-size: 16px;
         }
         
         .nav-links {
@@ -106,6 +111,8 @@
             padding: 15px;
             margin-bottom: 20px;
             border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
         }
         
         h1 {
@@ -113,226 +120,156 @@
             margin-bottom: 8px;
         }
         
-        .quiz-selector {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
+        .quiz-list {
+            display: grid;
+            gap: 15px;
         }
         
-        .quiz-btn {
-            padding: 8px 15px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 20px;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .quiz-btn.active {
-            background: var(--primary);
-            box-shadow: var(--neon-glow);
-        }
-        
-        .quiz-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-        
-        .results-container {
+        .quiz-card {
             background: var(--glass);
             backdrop-filter: blur(12px);
             border-radius: 12px;
             padding: 15px;
-            margin-bottom: 20px;
             border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .quiz-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 5px 15px rgba(93, 173, 236, 0.2);
         }
         
         .quiz-title {
-            font-size: 18px;
             font-weight: 500;
-            margin-bottom: 15px;
-            color: var(--accent);
-            text-align: center;
+            margin-bottom: 5px;
         }
         
-        .results-table {
-            width: 100%;
-            border-collapse: collapse;
+        .quiz-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 12px;
+            opacity: 0.8;
+            margin-bottom: 10px;
         }
         
-        .results-table th, 
-        .results-table td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        .submission-info {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.1);
         }
         
-        .results-table th {
-            background: rgba(0, 0, 0, 0.2);
+        .submission-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+        }
+        
+        .submission-details {
+            flex: 1;
+        }
+        
+        .submission-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
             font-weight: 500;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
         }
         
-        .results-table tr:last-child td {
-            border-bottom: none;
-        }
-        
-        .results-table tr:hover {
-            background: rgba(255, 255, 255, 0.05);
-        }
-        
-        .rank-1 {
-            background: rgba(255, 215, 0, 0.15);
-        }
-        
-        .rank-2 {
-            background: rgba(192, 192, 192, 0.15);
-        }
-        
-        .rank-3 {
-            background: rgba(205, 127, 50, 0.15);
-        }
-        
-        .rank-badge {
-            display: inline-block;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            text-align: center;
-            line-height: 24px;
-            font-weight: bold;
-            margin-right: 8px;
-        }
-        
-        .rank-1 .rank-badge {
-            background: var(--gold);
-            color: var(--dark);
-            box-shadow: 0 0 8px var(--gold);
-        }
-        
-        .rank-2 .rank-badge {
-            background: var(--silver);
-            color: var(--dark);
-            box-shadow: 0 0 8px var(--silver);
-        }
-        
-        .rank-3 .rank-badge {
-            background: var(--bronze);
+        .btn-primary {
+            background: var(--primary);
             color: white;
-            box-shadow: 0 0 8px var(--bronze);
         }
         
-        .score-cell {
-            font-weight: 500;
+        .btn-danger {
+            background: var(--error);
+            color: white;
         }
         
-        .score-high {
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+        
+        .score {
+            font-weight: bold;
+            color: var(--accent);
+        }
+        
+        .correct {
             color: var(--success);
         }
         
-        .score-medium {
-            color: var(--warning);
-        }
-        
-        .score-low {
+        .incorrect {
             color: var(--error);
         }
         
-        .duration-cell {
-            font-family: monospace;
-        }
-        
-        .no-results {
+        .empty-state {
             text-align: center;
             padding: 30px;
             opacity: 0.7;
         }
         
-        .top-students {
+        .bulk-actions {
             display: flex;
-            justify-content: space-around;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 15px;
+            justify-content: space-between;
+            margin-bottom: 15px;
         }
         
-        .top-student-card {
+        .search-filter {
             background: var(--glass);
             backdrop-filter: blur(12px);
-            border-radius: 12px;
-            padding: 15px;
-            width: 30%;
-            min-width: 200px;
-            text-align: center;
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-bottom: 15px;
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
-        .top-student-rank {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 10px;
-            font-size: 20px;
-            font-weight: bold;
-        }
-        
-        .rank-1-badge {
-            background: var(--gold);
-            color: var(--dark);
-            box-shadow: 0 0 15px var(--gold);
-        }
-        
-        .rank-2-badge {
-            background: var(--silver);
-            color: var(--dark);
-            box-shadow: 0 0 15px var(--silver);
-        }
-        
-        .rank-3-badge {
-            background: var(--bronze);
+        .search-filter input {
+            width: 100%;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
             color: white;
-            box-shadow: 0 0 15px var(--bronze);
         }
         
-        .top-student-name {
-            font-weight: 500;
-            margin-bottom: 5px;
+        .no-results {
+            text-align: center;
+            padding: 20px;
+            opacity: 0.7;
         }
         
-        .top-student-score {
-            font-size: 18px;
-            font-weight: bold;
+        .bg-elements {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
         }
         
-        .score-1 {
-            color: var(--gold);
-        }
-        
-        .score-2 {
-            color: var(--silver);
-        }
-        
-        .score-3 {
-            color: var(--bronze);
-        }
-        
-        @media (max-width: 768px) {
-            .results-table {
-                display: block;
-                overflow-x: auto;
-            }
-            
-            .quiz-selector {
-                flex-direction: column;
-            }
-            
-            .top-student-card {
-                width: 100%;
-            }
+        .bg-element {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--primary), transparent 70%);
+            opacity: 0.1;
+            filter: blur(30px);
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <!-- Background Elements -->
@@ -345,7 +282,7 @@
     <nav class="navbar">
         <div class="logo">
             <div class="logo-icon">👩‍🏫</div>
-            <span class="logo-text">DATA KUIS 8D</span>
+            <span class="logo-text">GURU KELAS 8D</span>
         </div>
         <div class="nav-links">
             <a href="manajemen.html" class="nav-link">MANAJEMEN</a>
@@ -353,276 +290,315 @@
             <a href="create-tugas.html" class="nav-link">BUAT TUGAS</a>
             <a href="pengumuman.html" class="nav-link">PENGUMUMAN</a>
             <a href="data-tugas.html" class="nav-link">DATA TUGAS</a>
-             <a href="data-kuis.html" class="nav-link active">DATA KUIS</a>
+            <a href="data-kuis.html" class="nav-link active">DATA KUIS</a>
         </div>
     </nav>
     
     <!-- Main Content -->
     <div class="container">
         <section class="header-section">
-            <h1>Data Hasil Kuis Kelas 8D</h1>
-            <p>Lihat hasil pengerjaan kuis oleh siswa</p>
+            <h1>Data Hasil Kuis</h1>
+            <p>Lihat dan kelola hasil kuis yang telah dikumpulkan murid</p>
         </section>
         
-        <div class="quiz-selector" id="quiz-selector">
-            <button class="quiz-btn active" id="all-quizzes-btn">Semua Kuis</button>
+        <div class="search-filter">
+            <input type="text" id="search-input" placeholder="Cari berdasarkan judul kuis atau nama murid...">
         </div>
         
-        <div id="top-students-display">
-            <!-- Top students will be shown here -->
+        <div class="bulk-actions">
+            <div>
+                <button class="btn btn-warning" id="refresh-data">
+                    <i class="fas fa-sync-alt"></i> Refresh Data
+                </button>
+            </div>
+            <div>
+                <button class="btn btn-danger" id="clear-all">
+                    <i class="fas fa-trash"></i> Hapus Semua Data
+                </button>
+            </div>
         </div>
         
-        <div id="results-display">
-            <!-- Results will be loaded here -->
+        <div class="quiz-list" id="submissions-container">
+            <!-- Data hasil kuis akan dimuat di sini -->
         </div>
     </div>
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Dynamic font sizing
+            // Ukuran font dinamis
             const baseFontSize = window.innerWidth < 400 ? 14 : 16;
             document.documentElement.style.fontSize = baseFontSize + 'px';
             
-            // DOM Elements
-            const quizSelector = document.getElementById('quiz-selector');
-            const resultsDisplay = document.getElementById('results-display');
-            const topStudentsDisplay = document.getElementById('top-students-display');
-            const allQuizzesBtn = document.getElementById('all-quizzes-btn');
+            // Touch feedback untuk tombol
+            const buttons = document.querySelectorAll('.btn, .nav-link');
+            buttons.forEach(btn => {
+                btn.addEventListener('touchstart', function() {
+                    this.style.transform = 'scale(0.95)';
+                });
+                btn.addEventListener('touchend', function() {
+                    this.style.transform = '';
+                });
+            });
             
-            // Auto-delete old quiz results (3 hours)
-            function autoDeleteOldResults() {
-                const allResults = JSON.parse(localStorage.getItem('quiz_results')) || {};
-                const now = new Date().getTime();
-                const threeHours = 3 * 60 * 60 * 1000; // 3 hours in milliseconds
-                
-                for (const [quizId, results] of Object.entries(allResults)) {
-                    const updatedResults = results.filter(result => {
-                        const resultTime = new Date(result.timestamp).getTime();
-                        return (now - resultTime) <= threeHours;
-                    });
-                    
-                    if (updatedResults.length === 0) {
-                        delete allResults[quizId];
-                    } else {
-                        allResults[quizId] = updatedResults;
-                    }
-                }
-                
-                localStorage.setItem('quiz_results', JSON.stringify(allResults));
+            // Mencegah zoom
+            document.addEventListener('gesturestart', function(e) {
+                e.preventDefault();
+            });
+
+            // Ambil data kuis dari localStorage
+            function getQuizSubmissions() {
+                return JSON.parse(localStorage.getItem('quiz_submissions')) || [];
             }
-            
-            // Load all quiz results
-            function loadQuizResults() {
-                // First auto-delete old results
-                autoDeleteOldResults();
-                
-                // Get all results from localStorage
-                const allResults = JSON.parse(localStorage.getItem('quiz_results')) || {};
-                const quizzes = JSON.parse(localStorage.getItem('teacher_quizzes')) || {};
-                
-                // Clear displays
-                resultsDisplay.innerHTML = '';
-                topStudentsDisplay.innerHTML = '';
-                
-                // Show all results by default
-                showAllResults(quizzes, allResults);
+
+            // Ambil data kuis guru dari localStorage
+            function getTeacherQuizzes() {
+                return JSON.parse(localStorage.getItem('teacher_quizzes')) || {};
             }
-            
-            // Show results for all quizzes
-            function showAllResults(quizzes, allResults) {
-                // Set active button
-                setActiveButton('Semua Kuis');
-                
-                let hasResults = false;
-                let allClassResults = [];
-                
-                // Process each quiz
-                for (const [quizId, results] of Object.entries(allResults)) {
-                    const quizTitle = quizzes[quizId]?.title || "Kuis Tidak Ditemukan";
-                    
-                    // Filter only 8D students
-                    const classResults = results.filter(r => r.studentName.includes('8D'));
-                    if (classResults.length === 0) continue;
-                    
-                    hasResults = true;
-                    
-                    // Add to all results for top students calculation
-                    allClassResults = allClassResults.concat(classResults.map(r => ({
-                        ...r,
-                        quizTitle: quizTitle
-                    })));
+
+            // Hapus submission tertentu
+            function deleteSubmission(submissionId) {
+                let submissions = getQuizSubmissions();
+                submissions = submissions.filter(sub => sub.submittedAt !== submissionId);
+                localStorage.setItem('quiz_submissions', JSON.stringify(submissions));
+                renderSubmissions();
+            }
+
+            // Hapus semua data
+            function clearAllSubmissions() {
+                if (confirm('Apakah Anda yakin ingin menghapus semua data hasil kuis? Aksi ini tidak dapat dibatalkan.')) {
+                    localStorage.removeItem('quiz_submissions');
+                    renderSubmissions();
                 }
+            }
+
+            // Render data submissions
+            function renderSubmissions(filter = '') {
+                const submissions = getQuizSubmissions();
+                const quizzes = getTeacherQuizzes();
+                const container = document.getElementById('submissions-container');
                 
-                if (!hasResults) {
-                    showNoResults();
+                if (submissions.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-inbox" style="font-size: 40px; margin-bottom: 10px;"></i>
+                            <p>Belum ada data hasil kuis yang dikumpulkan</p>
+                        </div>
+                    `;
                     return;
                 }
                 
-                // Calculate top students across all quizzes
-                const studentScores = {};
+                // Kelompokkan submission berdasarkan quizId
+                const groupedSubmissions = {};
                 
-                allClassResults.forEach(result => {
-                    if (!studentScores[result.studentName]) {
-                        studentScores[result.studentName] = {
-                            totalScore: 0,
-                            quizCount: 0,
-                            name: result.studentName.replace(' (8D)', '')
+                submissions.forEach(submission => {
+                    if (!groupedSubmissions[submission.quizId]) {
+                        groupedSubmissions[submission.quizId] = {
+                            quizTitle: submission.quizTitle,
+                            submissions: []
                         };
                     }
-                    studentScores[result.studentName].totalScore += result.score;
-                    studentScores[result.studentName].quizCount++;
+                    groupedSubmissions[submission.quizId].submissions.push(submission);
                 });
                 
-                // Calculate average scores
-                const studentsWithAverages = Object.values(studentScores).map(student => ({
-                    name: student.name,
-                    averageScore: Math.round(student.totalScore / student.quizCount)
-                }));
+                // Filter data berdasarkan input pencarian
+                const filteredGroups = Object.entries(groupedSubmissions).filter(([quizId, group]) => {
+                    if (!filter) return true;
+                    const searchTerm = filter.toLowerCase();
+                    return (
+                        group.quizTitle.toLowerCase().includes(searchTerm) ||
+                        group.submissions.some(sub => 
+                            sub.studentName.toLowerCase().includes(searchTerm)
+                    );
+                });
                 
-                // Sort by average score
-                const topStudents = studentsWithAverages.sort((a, b) => b.averageScore - a.averageScore).slice(0, 3);
-                
-                // Display top students
-                displayTopStudents(topStudents);
-                
-                // Create quiz results container
-                const container = document.createElement('div');
-                container.className = 'results-container';
-                
-                // Add title
-                const title = document.createElement('div');
-                title.className = 'quiz-title';
-                title.textContent = 'Hasil Semua Kuis';
-                container.appendChild(title);
-                
-                // Create table
-                const table = document.createElement('table');
-                table.className = 'results-table';
-                
-                // Create table header
-                const thead = document.createElement('thead');
-                thead.innerHTML = `
-                    <tr>
-                        <th>Kuis</th>
-                        <th>Nama Siswa</th>
-                        <th>Benar</th>
-                        <th>Salah</th>
-                        <th>Skor</th>
-                        <th>Waktu</th>
-                        <th>Tanggal</th>
-                    </tr>
-                `;
-                table.appendChild(thead);
-                
-                // Create table body
-                const tbody = document.createElement('tbody');
-                
-                // Add each student's result
-                allClassResults.forEach(result => {
-                    const row = document.createElement('tr');
-                    
-                    // Calculate correct and wrong answers
-                    const correct = result.correct || Math.round((result.score / 100) * (result.totalQuestions || 1));
-                    const wrong = (result.totalQuestions || 1) - correct;
-                    
-                    // Format duration
-                    const duration = result.duration ? formatDuration(result.duration) : '-';
-                    
-                    row.innerHTML = `
-                        <td>${result.quizTitle || quizzes[result.quizId]?.title || 'Kuis'}</td>
-                        <td>${result.studentName.replace(' (8D)', '')}</td>
-                        <td>${correct}</td>
-                        <td>${wrong}</td>
-                        <td class="score-cell ${getScoreClass(result.score)}">${result.score}%</td>
-                        <td class="duration-cell">${duration}</td>
-                        <td>${new Date(result.timestamp).toLocaleDateString()}</td>
+                if (filteredGroups.length === 0) {
+                    container.innerHTML = `
+                        <div class="no-results">
+                            <i class="fas fa-search" style="font-size: 30px; margin-bottom: 10px;"></i>
+                            <p>Tidak ditemukan hasil yang sesuai dengan pencarian</p>
+                        </div>
                     `;
-                    tbody.appendChild(row);
-                });
+                    return;
+                }
                 
-                table.appendChild(tbody);
-                container.appendChild(table);
-                resultsDisplay.appendChild(container);
-            }
-            
-            // Display top 3 students
-            function displayTopStudents(topStudents) {
-                if (topStudents.length === 0) return;
-                
-                const container = document.createElement('div');
-                container.className = 'results-container';
-                
-                const title = document.createElement('div');
-                title.className = 'quiz-title';
-                title.textContent = 'Siswa Terbaik';
-                container.appendChild(title);
-                
-                const topStudentsDiv = document.createElement('div');
-                topStudentsDiv.className = 'top-students';
-                
-                topStudents.forEach((student, index) => {
-                    const studentCard = document.createElement('div');
-                    studentCard.className = 'top-student-card';
+                // Render data yang sudah difilter
+                container.innerHTML = filteredGroups.map(([quizId, group]) => {
+                    // Dapatkan data kuis asli untuk pertanyaan
+                    const quiz = quizzes[quizId] || { questions: [] };
                     
-                    const rankClass = `rank-${index + 1}-badge`;
-                    const scoreClass = `score-${index + 1}`;
-                    
-                    studentCard.innerHTML = `
-                        <div class="top-student-rank ${rankClass}">${index + 1}</div>
-                        <div class="top-student-name">${student.name}</div>
-                        <div class="top-student-score ${scoreClass}">${student.averageScore}%</div>
+                    return `
+                        <div class="quiz-card">
+                            <div class="quiz-title">${group.quizTitle}</div>
+                            <div class="quiz-meta">
+                                <span>${group.submissions.length} Pengumpulan</span>
+                                <span>${quiz.questions.length} Pertanyaan</span>
+                            </div>
+                            
+                            <div class="submission-info">
+                                ${group.submissions.map(submission => `
+                                    <div class="submission-item">
+                                        <div class="submission-details">
+                                            <div><strong>${submission.studentName}</strong></div>
+                                            <div>
+                                                Skor: <span class="score">${submission.score}/${submission.totalQuestions}</span>
+                                                (${Math.round((submission.score / submission.totalQuestions) * 100)}%)
+                                            </div>
+                                            <div>
+                                                Dikumpulkan: ${new Date(submission.submittedAt).toLocaleString()}
+                                            </div>
+                                        </div>
+                                        <div class="submission-actions">
+                                            <button class="btn btn-primary view-details" data-submission-id="${submission.submittedAt}">
+                                                <i class="fas fa-eye"></i> Detail
+                                            </button>
+                                            <button class="btn btn-danger delete-submission" data-submission-id="${submission.submittedAt}">
+                                                <i class="fas fa-trash"></i> Hapus
+                                            </button>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
                     `;
-                    
-                    topStudentsDiv.appendChild(studentCard);
+                }).join('');
+                
+                // Tambahkan event listener untuk tombol detail
+                document.querySelectorAll('.view-details').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const submissionId = this.getAttribute('data-submission-id');
+                        showSubmissionDetails(submissionId);
+                    });
                 });
                 
-                container.appendChild(topStudentsDiv);
-                topStudentsDisplay.appendChild(container);
-            }
-            
-            // Show no results message
-            function showNoResults() {
-                const noResults = document.createElement('div');
-                noResults.className = 'no-results';
-                noResults.innerHTML = `
-                    <i class="fas fa-info-circle" style="font-size: 24px; margin-bottom: 10px;"></i>
-                    <p>Tidak ada data hasil kuis yang ditemukan</p>
-                `;
-                resultsDisplay.appendChild(noResults);
-            }
-            
-            // Helper function to set active button
-            function setActiveButton(buttonText) {
-                document.querySelectorAll('.quiz-btn').forEach(btn => {
-                    btn.classList.toggle('active', btn.textContent === buttonText);
+                // Tambahkan event listener untuk tombol hapus
+                document.querySelectorAll('.delete-submission').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const submissionId = this.getAttribute('data-submission-id');
+                        if (confirm('Apakah Anda yakin ingin menghapus data pengumpulan ini?')) {
+                            deleteSubmission(submissionId);
+                        }
+                    });
                 });
             }
-            
-            // Helper function to get score class
-            function getScoreClass(score) {
-                if (score >= 80) return 'score-high';
-                if (score >= 60) return 'score-medium';
-                return 'score-low';
+
+            // Tampilkan detail submission
+            function showSubmissionDetails(submissionId) {
+                const submissions = getQuizSubmissions();
+                const quizzes = getTeacherQuizzes();
+                const submission = submissions.find(sub => sub.submittedAt === submissionId);
+                
+                if (!submission) {
+                    alert('Data pengumpulan tidak ditemukan!');
+                    return;
+                }
+                
+                const quiz = quizzes[submission.quizId] || { questions: [] };
+                
+                let detailsHtml = `
+                    <div style="background: var(--glass); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                        <h3 style="margin-bottom: 10px;">${submission.quizTitle}</h3>
+                        <p><strong>Murid:</strong> ${submission.studentName}</p>
+                        <p><strong>Skor:</strong> ${submission.score}/${submission.totalQuestions} (${Math.round((submission.score / submission.totalQuestions) * 100)}%)</p>
+                        <p><strong>Dikumpulkan:</strong> ${new Date(submission.submittedAt).toLocaleString()}</p>
+                    </div>
+                    
+                    <div style="margin-top: 20px;">
+                        <h4 style="margin-bottom: 15px;">Detail Jawaban:</h4>
+                `;
+                
+                quiz.questions.forEach((question, index) => {
+                    const studentAnswer = submission.answers[index];
+                    let answerHtml = '';
+                    let isCorrect = false;
+                    
+                    if (question.type === 'multiple') {
+                        isCorrect = parseInt(studentAnswer) === question.correctAnswer;
+                        const selectedOption = question.options[studentAnswer] || 'Tidak dijawab';
+                        const correctOption = question.options[question.correctAnswer];
+                        
+                        answerHtml = `
+                            <p>Jawaban murid: <span class="${isCorrect ? 'correct' : 'incorrect'}">${selectedOption}</span></p>
+                            ${!isCorrect ? `<p>Jawaban benar: <span class="correct">${correctOption}</span></p>` : ''}
+                        `;
+                    } else {
+                        answerHtml = `
+                            <p>Jawaban murid:</p>
+                            <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 6px; margin: 5px 0;">
+                                ${studentAnswer || 'Tidak dijawab'}
+                            </div>
+                            <p>Jawaban yang diharapkan: ${question.correctAnswer}</p>
+                            <p><em>(Soal isian memerlukan penilaian manual)</em></p>
+                        `;
+                    }
+                    
+                    detailsHtml += `
+                        <div style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px dashed rgba(255,255,255,0.1);">
+                            <p><strong>Pertanyaan ${index + 1}:</strong> ${question.question}</p>
+                            ${answerHtml}
+                        </div>
+                    `;
+                });
+                
+                detailsHtml += `</div>`;
+                
+                // Tampilkan modal atau popup dengan detail
+                const modal = document.createElement('div');
+                modal.style.position = 'fixed';
+                modal.style.top = '0';
+                modal.style.left = '0';
+                modal.style.width = '100%';
+                modal.style.height = '100%';
+                modal.style.backgroundColor = 'rgba(0,0,0,0.8)';
+                modal.style.zIndex = '1000';
+                modal.style.display = 'flex';
+                modal.style.justifyContent = 'center';
+                modal.style.alignItems = 'center';
+                modal.style.padding = '20px';
+                modal.style.boxSizing = 'border-box';
+                
+                const modalContent = document.createElement('div');
+                modalContent.style.background = '#1a3a6a';
+                modalContent.style.borderRadius = '12px';
+                modalContent.style.padding = '20px';
+                modalContent.style.maxWidth = '600px';
+                modalContent.style.width = '100%';
+                modalContent.style.maxHeight = '80vh';
+                modalContent.style.overflowY = 'auto';
+                modalContent.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3>Detail Hasil Kuis</h3>
+                        <button id="close-modal" style="background: none; border: none; color: white; font-size: 20px; cursor: pointer;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    ${detailsHtml}
+                `;
+                
+                modal.appendChild(modalContent);
+                document.body.appendChild(modal);
+                
+                // Tambahkan event listener untuk tombol close
+                document.getElementById('close-modal').addEventListener('click', function() {
+                    document.body.removeChild(modal);
+                });
             }
-            
-            // Helper function to format duration (seconds to MM:SS)
-            function formatDuration(seconds) {
-                const mins = Math.floor(seconds / 60);
-                const secs = seconds % 60;
-                return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-            }
-            
-            // Event listener for all quizzes button
-            allQuizzesBtn.addEventListener('click', function() {
-                const quizzes = JSON.parse(localStorage.getItem('teacher_quizzes')) || {};
-                const allResults = JSON.parse(localStorage.getItem('quiz_results')) || {};
-                showAllResults(quizzes, allResults);
+
+            // Event listener untuk pencarian
+            document.getElementById('search-input').addEventListener('input', function() {
+                renderSubmissions(this.value);
             });
-            
-            // Initialize
-            loadQuizResults();
+
+            // Event listener untuk refresh data
+            document.getElementById('refresh-data').addEventListener('click', function() {
+                renderSubmissions(document.getElementById('search-input').value);
+            });
+
+            // Event listener untuk hapus semua data
+            document.getElementById('clear-all').addEventListener('click', clearAllSubmissions);
+
+            // Inisialisasi render
+            renderSubmissions();
         });
     </script>
 </body>
-
 </html>
