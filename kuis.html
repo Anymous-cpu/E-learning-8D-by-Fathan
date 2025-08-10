@@ -420,28 +420,10 @@
                 e.preventDefault();
             });
 
-            // Simpan data murid saat ini (simulasi login)
-            function setCurrentStudent() {
-                if (!localStorage.getItem('current_student')) {
-                    localStorage.setItem('current_student', JSON.stringify({
-                        id: 'murid001',
-                        name: 'Andi Wijaya',
-                        class: '8D'
-                    }));
-                }
-            }
-
-            // Ambil kuis dari localStorage (data yang dikirim guru)
+            // Ambil kuis dari localStorage
             function getQuizzesFromStorage() {
-                const student = JSON.parse(localStorage.getItem('current_student'));
-                const allQuizzes = JSON.parse(localStorage.getItem('teacher_quizzes')) || [];
-                
-                // Filter kuis yang ditujukan untuk kelas murid ini
-                return allQuizzes.filter(quiz => 
-                    quiz.targetClass === student.class || 
-                    quiz.targetClass === 'all' ||
-                    (Array.isArray(quiz.targetClass) && quiz.targetClass.includes(student.class)
-                );
+                const quizzes = JSON.parse(localStorage.getItem('teacher_quizzes')) || {};
+                return Object.values(quizzes); // Konversi object ke array
             }
 
             // Render daftar kuis
@@ -459,12 +441,6 @@
                     const deadline = new Date(quiz.deadline);
                     const isExpired = now > deadline;
                     
-                    // Cek apakah murid sudah mengerjakan kuis ini
-                    const results = JSON.parse(localStorage.getItem('quiz_results')) || {};
-                    const quizResults = results[quiz.id] || [];
-                    const student = JSON.parse(localStorage.getItem('current_student'));
-                    const hasSubmitted = quizResults.some(r => r.studentId === student.id);
-                    
                     return `
                         <div class="quiz-card" data-id="${quiz.id}">
                             <div class="quiz-title">${quiz.title}</div>
@@ -476,8 +452,8 @@
                             </div>
                             <div class="quiz-desc">${quiz.description || 'Tidak ada deskripsi'}</div>
                             <div class="quiz-actions">
-                                <button class="btn btn-accent start-quiz" ${isExpired || hasSubmitted ? 'disabled' : ''}>
-                                    <i class="fas fa-pencil-alt"></i> ${hasSubmitted ? 'Sudah Dikerjakan' : isExpired ? 'Waktu Habis' : 'Kerjakan Kuis'}
+                                <button class="btn btn-accent start-quiz" ${isExpired ? 'disabled' : ''}>
+                                    <i class="fas fa-pencil-alt"></i> ${isExpired ? 'Waktu Habis' : 'Kerjakan Kuis'}
                                 </button>
                             </div>
                         </div>
@@ -604,13 +580,13 @@
                 // Tampilkan hasil
                 showQuizResult(score, correct, totalQuestions);
                 
-                // Simpan hasil
-                saveQuizResult(quizId, quiz.title, score, details);
+                // Simpan hasil (simulasi)
+                saveQuizResult(quizId, quiz.title, score);
             });
 
             // Simpan hasil kuis
-            function saveQuizResult(quizId, quizTitle, score, details) {
-                const student = JSON.parse(localStorage.getItem('current_student'));
+            function saveQuizResult(quizId, quizTitle, score) {
+                const studentName = localStorage.getItem('current_student') || "Murid Tanpa Nama";
                 const results = JSON.parse(localStorage.getItem('quiz_results')) || {};
                 
                 if (!results[quizId]) {
@@ -618,13 +594,11 @@
                 }
                 
                 // Cek apakah siswa sudah mengerjakan kuis ini sebelumnya
-                const existingIndex = results[quizId].findIndex(r => r.studentId === student.id);
+                const existingIndex = results[quizId].findIndex(r => r.studentName === studentName);
                 const result = {
-                    studentId: student.id,
-                    studentName: student.name,
+                    studentName: studentName,
                     quizTitle: quizTitle,
                     score: score,
-                    details: details,
                     timestamp: new Date().toISOString()
                 };
                 
@@ -635,37 +609,6 @@
                 }
                 
                 localStorage.setItem('quiz_results', JSON.stringify(results));
-                
-                // Kirim data ke "server" (simulasi)
-                sendResultsToTeacher(quizId, result);
-            }
-
-            // Simulasi mengirim hasil ke guru
-            function sendResultsToTeacher(quizId, result) {
-                const teacherResults = JSON.parse(localStorage.getItem('teacher_results')) || {};
-                
-                if (!teacherResults[quizId]) {
-                    teacherResults[quizId] = [];
-                }
-                
-                // Cek apakah hasil ini sudah ada
-                const existingIndex = teacherResults[quizId].findIndex(r => 
-                    r.studentId === result.studentId && r.quizId === quizId
-                );
-                
-                if (existingIndex >= 0) {
-                    teacherResults[quizId][existingIndex] = {
-                        ...result,
-                        quizId: quizId
-                    };
-                } else {
-                    teacherResults[quizId].push({
-                        ...result,
-                        quizId: quizId
-                    });
-                }
-                
-                localStorage.setItem('teacher_results', JSON.stringify(teacherResults));
             }
 
             // Tampilkan hasil kuis
@@ -694,66 +637,8 @@
                 renderQuizList();
             });
 
-            // Inisialisasi data murid
-            setCurrentStudent();
-            
             // Inisialisasi render daftar kuis
             renderQuizList();
-            
-            // Sample data untuk testing (dari guru)
-            function initializeSampleQuizzes() {
-                if (!localStorage.getItem('teacher_quizzes')) {
-                    const sampleQuizzes = [
-                        {
-                            id: "kuis1",
-                            title: "Matematika - Bab Aljabar",
-                            description: "Kuis tentang dasar-dasar aljabar untuk kelas 8D",
-                            deadline: "2023-12-31T23:59:59",
-                            targetClass: "8D",
-                            questions: [
-                                {
-                                    id: 1,
-                                    question: "Berapa hasil dari 2x + 3 = 11?",
-                                    type: "multiple",
-                                    options: ["x = 4", "x = 5", "x = 6", "x = 7"],
-                                    correctAnswer: 0
-                                },
-                                {
-                                    id: 2,
-                                    question: "Sederhanakan: 3(x + 4) - 2x",
-                                    type: "essay",
-                                    correctAnswer: "x + 12"
-                                }
-                            ]
-                        },
-                        {
-                            id: "kuis2",
-                            title: "IPA - Sistem Tata Surya",
-                            description: "Kuis tentang planet dan tata surya untuk semua kelas",
-                            deadline: "2023-12-31T23:59:59",
-                            targetClass: "all",
-                            questions: [
-                                {
-                                    id: 1,
-                                    question: "Planet terdekat dari matahari adalah?",
-                                    type: "multiple",
-                                    options: ["Venus", "Mars", "Mercury", "Bumi"],
-                                    correctAnswer: 2
-                                },
-                                {
-                                    id: 2,
-                                    question: "Jelaskan mengapa bumi bisa mendukung kehidupan?",
-                                    type: "essay"
-                                }
-                            ]
-                        }
-                    ];
-                    
-                    localStorage.setItem('teacher_quizzes', JSON.stringify(sampleQuizzes));
-                }
-            }
-            
-            initializeSampleQuizzes();
         });
     </script>
 </body>
