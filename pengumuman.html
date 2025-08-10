@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pengumuman | Guru</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap');
+        @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css');
+        
+        :root {
+            --primary: #5dadec;
+            --accent: #00f7ff;
+            --light: #e6f7ff;
+            --dark: #1a3a6a;
+            --glass: rgba(255, 255, 255, 0.15);
+            --neon-glow: 0 0 10px var(--accent);
+            --error: #ff6b6b;
+            --success: #2ecc71;
+            --warning: #f39c12;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Zen Kaku Gothic New', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0a1a2e, #1a3a6a);
+            min-height: 100vh;
+            color: var(--light);
+            touch-action: manipulation;
+        }
+        
+        .navbar {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 15px;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 15px var(--primary), inset 0 0 5px white;
+        }
+        
+        .nav-links {
+            display: flex;
+            overflow-x: auto;
+            gap: 8px;
+            padding-bottom: 5px;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .nav-link {
+            color: var(--light);
+            text-decoration: none;
+            font-size: 13px;
+            padding: 8px 12px;
+            border-radius: 20px;
+            transition: all 0.3s;
+            white-space: nowrap;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .nav-link.active {
+            background: var(--primary);
+            box-shadow: var(--neon-glow);
+        }
+        
+        .container {
+            margin-top: 100px;
+            padding: 15px;
+            padding-bottom: 80px;
+        }
+        
+        .header-section {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        h1 {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+        
+        .form-group {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .form-control {
+            margin-bottom: 15px;
+        }
+        
+        .form-control label {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 5px;
+            opacity: 0.8;
+        }
+        
+        .form-control input,
+        .form-control textarea {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+        }
+        
+        .form-control textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        .priority-selector {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .priority-btn {
+            flex: 1;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .priority-btn.active {
+            border-color: var(--accent);
+            box-shadow: var(--neon-glow);
+        }
+        
+        .priority-normal.active {
+            background: rgba(93, 173, 236, 0.2);
+        }
+        
+        .priority-important.active {
+            background: rgba(242, 38, 19, 0.2);
+        }
+        
+        .priority-urgent.active {
+            background: rgba(255, 165, 0, 0.2);
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+            min-width: 80px;
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 15px rgba(93, 173, 236, 0.3);
+        }
+        
+        .btn-primary:hover {
+            background: #4ca0d8;
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background: var(--error);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .bg-elements {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .bg-element {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--primary), transparent 70%);
+            opacity: 0.1;
+            filter: blur(30px);
+        }
+        
+        .announcement-list {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .announcement-card {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s;
+        }
+        
+        .announcement-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 5px 15px rgba(93, 173, 236, 0.2);
+        }
+        
+        .announcement-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .announcement-title {
+            font-weight: 500;
+            font-size: 16px;
+        }
+        
+        .announcement-priority {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .priority-normal {
+            background: rgba(93, 173, 236, 0.2);
+            color: var(--primary);
+        }
+        
+        .priority-important {
+            background: rgba(242, 38, 19, 0.2);
+            color: #f22613;
+        }
+        
+        .priority-urgent {
+            background: rgba(255, 165, 0, 0.2);
+            color: orange;
+        }
+        
+        .announcement-time {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-bottom: 10px;
+        }
+        
+        .announcement-content {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .no-announcements {
+            text-align: center;
+            padding: 30px;
+            opacity: 0.7;
+        }
+        
+        @media (max-width: 768px) {
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Elements -->
+    <div class="bg-elements">
+        <div class="bg-element" style="width: 300px; height: 300px; top: -50px; left: -50px;"></div>
+        <div class="bg-element" style="width: 200px; height: 200px; bottom: -30px; right: -30px;"></div>
+    </div>
+    
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="logo">
+            <div class="logo-icon"></div>
+            <span class="logo-text">GURU KELAS 8D</span>
+        </div>
+        <div class="nav-links">
+            <a href="manajemen.html" class="nav-link">MANAJEMEN</a>
+            <a href="create-kuis.html" class="nav-link">BUAT KUIS</a>
+            <a href="create-tugas.html" class="nav-link">BUAT TUGAS</a>
+            <a href="pengumuman.html" class="nav-link active">PENGUMUMAN</a>
+            <a href="data-tugas.html" class="nav-link">DATA TUGAS</a>
+             <a href="data-kuis.html" class="nav-link">DATA KUIS</a>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <div class="container">
+        <section class="header-section">
+            <h1>Buat Pengumuman</h1>
+            <p>Sampaikan informasi penting ke seluruh siswa kelas 8D</p>
+        </section>
+        
+        <div class="form-group">
+            <div class="form-control">
+                <label for="announcement-title">Judul Pengumuman</label>
+                <input type="text" id="announcement-title" placeholder="Misal: Libur Hari Pendidikan Nasional">
+            </div>
+            <div class="form-control">
+                <label for="announcement-content">Isi Pengumuman</label>
+                <textarea id="announcement-content" placeholder="Tuliskan detail pengumuman di sini"></textarea>
+            </div>
+            <div class="form-control">
+                <label>Prioritas</label>
+                <div class="priority-selector">
+                    <button class="priority-btn priority-normal active" data-priority="normal">
+                        <i class="fas fa-info-circle"></i> Normal
+                    </button>
+                    <button class="priority-btn priority-important" data-priority="important">
+                        <i class="fas fa-exclamation-circle"></i> Penting
+                    </button>
+                    <button class="priority-btn priority-urgent" data-priority="urgent">
+                        <i class="fas fa-exclamation-triangle"></i> Mendesak
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-actions">
+            <button class="btn btn-danger" id="cancel-announcement">
+                <i class="fas fa-times"></i> Batal
+            </button>
+            <button class="btn btn-primary" id="publish-announcement">
+                <i class="fas fa-bullhorn"></i> Publikasikan
+            </button>
+        </div>
+        
+        <h2 style="margin: 25px 0 15px; font-size: 18px;">Pengumuman Terkini</h2>
+        <div class="announcement-list" id="announcements-list">
+            <!-- Daftar pengumuman akan muncul di sini -->
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ukuran font dinamis
+            const baseFontSize = window.innerWidth < 400 ? 14 : 16;
+            document.documentElement.style.fontSize = baseFontSize + 'px';
+            
+            // Simpan pengumuman ke localStorage
+            function saveAnnouncementToStorage(announcement) {
+                let announcements = JSON.parse(localStorage.getItem('teacher_announcements')) || [];
+                announcements.unshift(announcement); // Add to beginning of array
+                localStorage.setItem('teacher_announcements', JSON.stringify(announcements));
+                localStorage.setItem('student_announcements', JSON.stringify(announcements));
+            }
+
+            // Ambil pengumuman dari localStorage
+            function getAnnouncementsFromStorage() {
+                return JSON.parse(localStorage.getItem('teacher_announcements')) || [];
+            }
+
+            // Render daftar pengumuman
+            function renderAnnouncements() {
+                const announcements = getAnnouncementsFromStorage();
+                const container = document.getElementById('announcements-list');
+                
+                if (announcements.length === 0) {
+                    container.innerHTML = `
+                        <div class="no-announcements">
+                            <i class="fas fa-info-circle"></i>
+                            <p>Belum ada pengumuman</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = announcements.map(ann => `
+                    <div class="announcement-card">
+                        <div class="announcement-header">
+                            <div class="announcement-title">${ann.title}</div>
+                            <div class="announcement-priority priority-${ann.priority}">
+                                ${ann.priority === 'normal' ? '<i class="fas fa-info-circle"></i> Normal' : ''}
+                                ${ann.priority === 'important' ? '<i class="fas fa-exclamation-circle"></i> Penting' : ''}
+                                ${ann.priority === 'urgent' ? '<i class="fas fa-exclamation-triangle"></i> Mendesak' : ''}
+                            </div>
+                        </div>
+                        <div class="announcement-time">
+                            ${new Date(ann.timestamp).toLocaleString()}
+                        </div>
+                        <div class="announcement-content">
+                            ${ann.content.replace(/\n/g, '<br>')}
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Inisialisasi render
+            renderAnnouncements();
+
+            // Priority selection
+            const priorityBtns = document.querySelectorAll('.priority-btn');
+            let selectedPriority = 'normal';
+            
+            priorityBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    priorityBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    selectedPriority = this.getAttribute('data-priority');
+                });
+            });
+
+            // Publish announcement
+            document.getElementById('publish-announcement').addEventListener('click', function() {
+                const title = document.getElementById('announcement-title').value;
+                const content = document.getElementById('announcement-content').value;
+                
+                if (!title) {
+                    alert('Judul pengumuman harus diisi!');
+                    return;
+                }
+                
+                if (!content) {
+                    alert('Isi pengumuman harus diisi!');
+                    return;
+                }
+                
+                const newAnnouncement = {
+                    id: Date.now().toString(),
+                    title: title,
+                    content: content,
+                    priority: selectedPriority,
+                    timestamp: new Date().toISOString()
+                };
+                
+                saveAnnouncementToStorage(newAnnouncement);
+                alert('Pengumuman berhasil dipublikasikan ke semua siswa!');
+                renderAnnouncements();
+                
+                // Reset form
+                document.getElementById('announcement-title').value = '';
+                document.getElementById('announcement-content').value = '';
+                
+                // Reset priority to normal
+                priorityBtns.forEach(b => b.classList.remove('active'));
+                document.querySelector('.priority-normal').classList.add('active');
+                selectedPriority = 'normal';
+            });
+
+            // Cancel announcement
+            document.getElementById('cancel-announcement').addEventListener('click', function() {
+                if (confirm('Apakah Anda yakin ingin membatalkan? Semua perubahan akan hilang.')) {
+                    document.getElementById('announcement-title').value = '';
+                    document.getElementById('announcement-content').value = '';
+                    
+                    // Reset priority to normal
+                    priorityBtns.forEach(b => b.classList.remove('active'));
+                    document.querySelector('.priority-normal').classList.add('active');
+                    selectedPriority = 'normal';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

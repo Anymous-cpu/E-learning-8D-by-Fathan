@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kelas 8D - Login</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap');
+        
+        :root {
+            --primary: #5dadec;
+            --accent: #00f7ff;
+            --light: #e6f7ff;
+            --dark: #1a3a6a;
+            --glass: rgba(255, 255, 255, 0.15);
+            --neon-glow: 0 0 10px var(--accent);
+            --error: #ff6b6b;
+            --success: #2ecc71;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Zen Kaku Gothic New', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0a1a2e, #1a3a6a);
+            min-height: 100vh;
+            color: var(--light);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            touch-action: manipulation;
+            overflow: hidden;
+        }
+        
+        .login-container {
+            width: 90%;
+            max-width: 400px;
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .logo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 
+                0 0 20px var(--primary),
+                inset 0 0 10px white;
+            margin: 0 auto;
+        }
+        
+        .logo-icon i {
+            font-size: 28px;
+        }
+        
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        p {
+            opacity: 0.8;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .role-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .role-btn {
+            padding: 14px;
+            border-radius: 10px;
+            border: none;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .student-btn {
+            background: var(--accent);
+            color: var(--dark);
+        }
+        
+        .teacher-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .role-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--neon-glow);
+        }
+        
+        .teacher-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .login-form {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: white;
+            font-size: 15px;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(0, 247, 255, 0.2);
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .submit-btn:hover {
+            background: #4ca0d8;
+            transform: translateY(-2px);
+            box-shadow: var(--neon-glow);
+        }
+        
+        .back-btn {
+            background: none;
+            border: none;
+            color: var(--accent);
+            cursor: pointer;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            font-size: 14px;
+            width: 100%;
+        }
+        
+        .error-message {
+            color: var(--error);
+            font-size: 13px;
+            margin-top: 5px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        
+        .bg-elements {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .bg-element {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--primary), transparent 70%);
+            opacity: 0.1;
+            filter: blur(30px);
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Background Elements -->
+    <div class="bg-elements">
+        <div class="bg-element" style="width: 300px; height: 300px; top: -50px; left: -50px;"></div>
+        <div class="bg-element" style="width: 200px; height: 200px; bottom: -30px; right: -30px;"></div>
+    </div>
+    
+    <div class="login-container" id="login-container">
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="fas fa-graduation-cap"></i>
+            </div>
+        </div>
+        
+        <h1>Selamat Datang</h1>
+        <p>Silakan pilih peran Anda</p>
+        
+        <div class="role-buttons" id="role-buttons">
+            <button class="role-btn student-btn" id="student-btn">
+                <i class="fas fa-user-graduate"></i> Masuk sebagai Murid
+            </button>
+            <button class="role-btn teacher-btn" id="teacher-btn">
+                <i class="fas fa-chalkboard-teacher"></i> Masuk sebagai Guru
+            </button>
+        </div>
+        
+        <form class="login-form" id="teacher-login-form" onsubmit="event.preventDefault();">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" class="form-control" placeholder="Masukkan username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" class="form-control" placeholder="Masukkan password" required>
+                <div class="error-message" id="error-message">
+                    <i class="fas fa-exclamation-circle"></i> Username atau password salah
+                </div>
+            </div>
+            <button type="submit" class="submit-btn" id="login-btn">
+                <i class="fas fa-sign-in-alt"></i> Masuk
+            </button>
+            <button type="button" class="back-btn" id="back-btn">
+                <i class="fas fa-arrow-left"></i> Kembali
+            </button>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const roleButtons = document.getElementById('role-buttons');
+            const teacherLoginForm = document.getElementById('teacher-login-form');
+            const studentBtn = document.getElementById('student-btn');
+            const teacherBtn = document.getElementById('teacher-btn');
+            const backBtn = document.getElementById('back-btn');
+            const loginBtn = document.getElementById('login-btn');
+            const errorMessage = document.getElementById('error-message');
+            const loginContainer = document.getElementById('login-container');
+            
+            // Mencegah zoom
+            document.addEventListener('gesturestart', function(e) {
+                e.preventDefault();
+            }, { passive: false });
+            
+            // Disable double tap zoom
+            document.addEventListener('dblclick', function(e) {
+                e.preventDefault();
+            }, { passive: false });
+            
+            // Tombol murid
+            studentBtn.addEventListener('click', function() {
+                window.location.href = "login-murid.html";
+            });
+            
+            // Tombol guru
+            teacherBtn.addEventListener('click', function() {
+                roleButtons.style.display = 'none';
+                teacherLoginForm.style.display = 'block';
+                document.getElementById('username').focus();
+            });
+            
+            // Tombol kembali
+            backBtn.addEventListener('click', function() {
+                teacherLoginForm.style.display = 'none';
+                roleButtons.style.display = 'flex';
+                errorMessage.style.display = 'none';
+                document.getElementById('username').value = '';
+                document.getElementById('password').value = '';
+            });
+            
+            // Proses login guru
+            teacherLoginForm.addEventListener('submit', function() {
+                const username = document.getElementById('username').value.trim();
+                const password = document.getElementById('password').value.trim();
+                
+                // Validasi login
+                if (username === "Guru 8D" && password === "1331") {
+                    // Login berhasil
+                    window.location.href = "manajemen.html";
+                } else {
+                    // Login gagal
+                    errorMessage.style.display = 'flex';
+                    document.getElementById('password').value = '';
+                    
+                    // Animasi gagal login
+                    loginContainer.style.animation = 'shake 0.5s';
+                    setTimeout(() => {
+                        loginContainer.style.animation = '';
+                    }, 500);
+                }
+            });
+            
+            // Handle Enter key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && teacherLoginForm.style.display === 'block') {
+                    teacherLoginForm.dispatchEvent(new Event('submit'));
+                }
+            });
+        });
+    </script>
+</body>
+</html>

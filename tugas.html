@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tugas Kelas | Murid</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap');
+        
+        :root {
+            --primary: #5dadec;
+            --accent: #00f7ff;
+            --light: #e6f7ff;
+            --dark: #1a3a6a;
+            --glass: rgba(255, 255, 255, 0.15);
+            --neon-glow: 0 0 10px var(--accent);
+            --error: #ff6b6b;
+            --success: #2ecc71;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Zen Kaku Gothic New', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0a1a2e, #1a3a6a);
+            min-height: 100vh;
+            color: var(--light);
+            perspective: 1000px;
+            touch-action: manipulation;
+        }
+        
+        .navbar {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 15px;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 
+                0 0 15px var(--primary),
+                inset 0 0 5px white;
+        }
+        
+        .logo-text {
+            font-weight: 500;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            font-size: 16px;
+        }
+        
+        .nav-links {
+            display: flex;
+            overflow-x: auto;
+            gap: 8px;
+            padding-bottom: 5px;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .nav-link {
+            color: var(--light);
+            text-decoration: none;
+            font-size: 13px;
+            padding: 8px 12px;
+            border-radius: 20px;
+            transition: all 0.3s;
+            white-space: nowrap;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .nav-link.active {
+            background: var(--primary);
+            box-shadow: var(--neon-glow);
+        }
+        
+        .container {
+            margin-top: 100px;
+            padding: 15px;
+            padding-bottom: 80px;
+        }
+        
+        .header-section {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        h1 {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+        
+        .task-list {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .task-card {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s;
+        }
+        
+        .task-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 5px 15px rgba(93, 173, 236, 0.2);
+        }
+        
+        .task-title {
+            font-weight: 500;
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+        
+        .task-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            opacity: 0.8;
+            margin-bottom: 10px;
+        }
+        
+        .task-status {
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        
+        .status-active {
+            background: rgba(46, 204, 113, 0.2);
+            color: var(--success);
+        }
+        
+        .status-expired {
+            background: rgba(255, 107, 107, 0.2);
+            color: var(--error);
+        }
+        
+        .task-desc {
+            font-size: 13px;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+        
+        .task-files {
+            margin-top: 10px;
+        }
+        
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+            margin-bottom: 5px;
+            transition: all 0.2s;
+        }
+        
+        .file-item:hover {
+            background: rgba(0, 0, 0, 0.3);
+        }
+        
+        .file-icon {
+            margin-right: 8px;
+            color: var(--accent);
+            width: 20px;
+            text-align: center;
+        }
+        
+        .file-name {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .file-download {
+            color: var(--accent);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 4px;
+        }
+        
+        .file-download:hover {
+            background: rgba(0, 247, 255, 0.1);
+        }
+        
+        .file-preview {
+            max-width: 100%;
+            max-height: 200px;
+            margin-top: 5px;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .task-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 15px;
+        }
+        
+        .btn {
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s;
+            min-width: 80px;
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 2px 10px rgba(93, 173, 236, 0.3);
+        }
+        
+        .btn-primary:hover {
+            background: #4ca0d8;
+            transform: translateY(-2px);
+        }
+        
+        .btn-accent {
+            background: var(--accent);
+            color: var(--dark);
+            box-shadow: 0 2px 10px rgba(0, 247, 255, 0.3);
+        }
+        
+        /* Task Detail View */
+        .task-detail-container {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .task-info {
+            margin-bottom: 15px;
+        }
+        
+        .task-deadline {
+            color: var(--accent);
+            font-size: 13px;
+        }
+        
+        .submission-section {
+            margin-top: 20px;
+        }
+        
+        .submission-input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: white;
+            margin-top: 10px;
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .file-upload-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s;
+        }
+        
+        .file-upload-label:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--accent);
+        }
+        
+        .file-list {
+            margin-top: 10px;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        .bg-elements {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .bg-element {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--primary), transparent 70%);
+            opacity: 0.1;
+            filter: blur(30px);
+        }
+        
+        /* Preview Modal */
+        .preview-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .preview-content {
+            max-width: 90%;
+            max-height: 90%;
+            background: var(--dark);
+            border-radius: 8px;
+            padding: 15px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .preview-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--error);
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2;
+        }
+        
+        .preview-image {
+            max-width: 100%;
+            max-height: 80vh;
+            display: block;
+            margin: 0 auto;
+            border-radius: 4px;
+        }
+        
+        .preview-document {
+            width: 80vw;
+            height: 80vh;
+            border: none;
+            border-radius: 4px;
+        }
+        
+        .preview-header {
+            padding: 10px 0;
+            margin-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .preview-body {
+            flex: 1;
+            overflow: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .unsupported-file {
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .download-btn {
+            margin-top: 15px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .download-btn:hover {
+            background: #4ca0d8;
+        }
+        
+        .file-info {
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .file-info-item {
+            margin-bottom: 5px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- PDF.js for PDF rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+</head>
+<body>
+    <!-- Background Elements -->
+    <div class="bg-elements">
+        <div class="bg-element" style="width: 300px; height: 300px; top: -50px; left: -50px;"></div>
+        <div class="bg-element" style="width: 200px; height: 200px; bottom: -30px; right: -30px;"></div>
+    </div>
+    
+    <!-- Preview Modal -->
+    <div class="preview-modal" id="previewModal">
+        <div class="preview-content">
+            <button class="preview-close" id="closePreview">&times;</button>
+            <div class="preview-header">
+                <h3 id="previewFileName">File Preview</h3>
+                <div class="file-info" id="fileInfo"></div>
+            </div>
+            <div class="preview-body" id="previewContainer"></div>
+            <div style="text-align: center; margin-top: 15px;">
+                <button class="download-btn" id="downloadPreview">
+                    <i class="fas fa-download"></i> Download File
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="logo">
+            <div class="logo-icon">👨‍🎓</div>
+            <span class="logo-text">TUGAS KELAS 8D</span>
+        </div>
+        <div class="nav-links">
+            <a href="dashboard.html" class="nav-link">DASHBOARD</a>
+            <a href="kuis.html" class="nav-link">KUIS</a>
+            <a href="tugas.html" class="nav-link active">TUGAS</a>
+            <a href="jadwal.html" class="nav-link">JADWAL</a>
+            <a href="notifikasi.html" class="nav-link">INFORMASI</a>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <div class="container">
+        <section class="header-section">
+            <h1>Daftar Tugas</h1>
+            <p>Tugas yang diberikan oleh guru</p>
+        </section>
+        
+        <div class="task-list" id="tasks-container">
+            <!-- Daftar tugas akan dimuat di sini -->
+        </div>
+        
+        <!-- Template untuk halaman detail tugas (awalnya tersembunyi) -->
+        <div id="task-detail" style="display: none;">
+            <div class="task-detail-container">
+                <div class="task-info">
+                    <h2 id="detail-task-title"></h2>
+                    <div class="task-deadline" id="detail-task-deadline"></div>
+                    <div class="task-desc" id="detail-task-desc"></div>
+                    
+                    <div class="task-files" id="detail-task-files">
+                        <!-- File lampiran akan dimuat di sini -->
+                    </div>
+                </div>
+                
+                <div class="submission-section">
+                    <h3>Kirim Tugas</h3>
+                    <textarea class="submission-input" id="submission-text" placeholder="Tulis jawaban atau penjelasan tugas Anda di sini..."></textarea>
+                    
+                    <label for="submission-file" class="file-upload-label">
+                        <i class="fas fa-paperclip"></i>
+                        <span>Lampirkan File Jawaban</span>
+                    </label>
+                    <input type="file" id="submission-file" style="display: none;">
+                    
+                    <div class="file-list" id="submission-file-list">
+                        <!-- File yang diunggah siswa akan muncul di sini -->
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button class="btn btn-danger" id="back-to-list">
+                        Kembali
+                    </button>
+                    <button class="btn btn-primary" id="submit-task">
+                        Kirim Tugas
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Initialize PDF.js worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
+        
+        // Sample task data (in a real app, this would come from a server)
+        const sampleTasks = [
+            {
+                id: 'task1',
+                title: 'Tugas Matematika - Aljabar',
+                description: 'Selesaikan soal-soal aljabar pada halaman 45-46 buku paket. Kerjakan dengan lengkap dan jelas.',
+                deadline: new Date(Date.now() + 86400000 * 3).toISOString(), // 3 days from now
+                files: [
+                    { name: 'soal-matematika.pdf', type: 'application/pdf', url: 'https://example.com/files/soal-matematika.pdf' },
+                    { name: 'contoh-jawaban.jpg', type: 'image/jpeg', url: 'https://example.com/files/contoh-jawaban.jpg' }
+                ]
+            },
+            {
+                id: 'task2',
+                title: 'Tugas IPA - Sistem Pencernaan',
+                description: 'Buatlah diagram sistem pencernaan manusia dan jelaskan fungsi masing-masing organ.',
+                deadline: new Date(Date.now() + 86400000 * 5).toISOString(), // 5 days from now
+                files: [
+                    { name: 'petunjuk-tugas.docx', type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', url: 'https://example.com/files/petunjuk-tugas.docx' }
+                ]
+            },
+            {
+                id: 'task3',
+                title: 'Tugas Bahasa Inggris - Essay',
+                description: 'Tulis essay tentang "My Dream Vacation" minimal 200 kata.',
+                deadline: new Date(Date.now() - 86400000 * 1).toISOString(), // 1 day ago (expired)
+                files: []
+            }
+        ];
+
+        // Check if tasks exist in localStorage, if not, save sample tasks
+        if (!localStorage.getItem('student_tasks')) {
+            localStorage.setItem('student_tasks', JSON.stringify(sampleTasks));
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ukuran font dinamis
+            const baseFontSize = window.innerWidth < 400 ? 14 : 16;
+            document.documentElement.style.fontSize = baseFontSize + 'px';
+            
+            // Touch feedback untuk tombol
+            const buttons = document.querySelectorAll('.btn, .nav-link');
+            buttons.forEach(btn => {
+                btn.addEventListener('touchstart', function() {
+                    this.style.transform = 'scale(0.95)';
+                });
+                btn.addEventListener('touchend', function() {
+                    this.style.transform = '';
+                });
+            });
+            
+            // Mencegah zoom
+            document.addEventListener('gesturestart', function(e) {
+                e.preventDefault();
+            });
+
+            // Ambil tugas dari localStorage
+            function getTasksFromStorage() {
+                return JSON.parse(localStorage.getItem('student_tasks')) || [];
+            }
+
+            // Render daftar tugas
+            function renderTaskList() {
+                const tasks = getTasksFromStorage();
+                const container = document.getElementById('tasks-container');
+                
+                if (tasks.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; padding: 20px; opacity: 0.7;">Tidak ada tugas tersedia saat ini</p>';
+                    return;
+                }
+                
+                container.innerHTML = tasks.map(task => {
+                    const now = new Date();
+                    const deadline = new Date(task.deadline);
+                    const isExpired = now > deadline;
+                    
+                    return `
+                        <div class="task-card" data-id="${task.id}">
+                            <div class="task-title">${task.title}</div>
+                            <div class="task-meta">
+                                <span>Batas: ${formatDate(deadline)}</span>
+                                <span class="task-status ${isExpired ? 'status-expired' : 'status-active'}">
+                                    ${isExpired ? 'TERLAMBAT' : 'AKTIF'}
+                                </span>
+                            </div>
+                            <div class="task-desc">${task.description || 'Tidak ada deskripsi'}</div>
+                            ${task.files && task.files.length > 0 ? `
+                                <div class="task-files">
+                                    ${task.files.slice(0, 2).map(file => `
+                                        <div class="file-item">
+                                            <i class="${getFileIcon(file.name)} file-icon"></i>
+                                            <span class="file-name">${file.name}</span>
+                                            <button class="file-download" data-name="${file.name}" data-type="${file.type}" data-url="${file.url || ''}">
+                                                <i class="fas fa-download"></i>
+                                            </button>
+                                        </div>
+                                    `).join('')}
+                                    ${task.files.length > 2 ? `
+                                        <div class="file-item">
+                                            <i class="fas fa-ellipsis-h file-icon"></i>
+                                            <span class="file-name">+${task.files.length - 2} file lainnya</span>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            ` : ''}
+                            <div class="task-actions">
+                                <button class="btn btn-accent view-task">
+                                    <i class="fas fa-eye"></i> Lihat Detail
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                // Tambahkan event listener untuk tombol lihat detail
+                document.querySelectorAll('.view-task').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const taskId = this.closest('.task-card').dataset.id;
+                        showTaskDetail(taskId);
+                    });
+                });
+                
+                // Tambahkan event listener untuk tombol download
+                document.querySelectorAll('.file-download').forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const fileName = this.getAttribute('data-name');
+                        const fileType = this.getAttribute('data-type');
+                        const fileUrl = this.getAttribute('data-url');
+                        previewFile(fileName, fileType, fileUrl);
+                    });
+                });
+            }
+
+            // Format tanggal
+            function formatDate(date) {
+                const options = { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                };
+                return date.toLocaleDateString('id-ID', options);
+            }
+
+            // Dapatkan ikon berdasarkan jenis file
+            function getFileIcon(filename) {
+                const extension = filename.split('.').pop().toLowerCase();
+                const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp'];
+                const docExtensions = ['doc', 'docx'];
+                const pdfExtensions = ['pdf'];
+                const excelExtensions = ['xls', 'xlsx'];
+                const pptExtensions = ['ppt', 'pptx'];
+                const videoExtensions = ['mp4', 'webm', 'ogg'];
+                const audioExtensions = ['mp3', 'wav', 'ogg'];
+                
+                if (imageExtensions.includes(extension)) return 'fas fa-image';
+                if (docExtensions.includes(extension)) return 'fas fa-file-word';
+                if (pdfExtensions.includes(extension)) return 'fas fa-file-pdf';
+                if (excelExtensions.includes(extension)) return 'fas fa-file-excel';
+                if (pptExtensions.includes(extension)) return 'fas fa-file-powerpoint';
+                if (extension === 'zip' || extension === 'rar' || extension === '7z') return 'fas fa-file-archive';
+                if (videoExtensions.includes(extension)) return 'fas fa-file-video';
+                if (audioExtensions.includes(extension)) return 'fas fa-file-audio';
+                if (extension === 'txt') return 'fas fa-file-alt';
+                return 'fas fa-file';
+            }
+
+            // Tampilkan preview file
+            function previewFile(filename, fileType, fileUrl) {
+                const modal = document.getElementById('previewModal');
+                const container = document.getElementById('previewContainer');
+                const fileNameElement = document.getElementById('previewFileName');
+                const fileInfoElement = document.getElementById('fileInfo');
+                const downloadBtn = document.getElementById('downloadPreview');
+                
+                // Set file name
+                fileNameElement.textContent = filename;
+                
+                // Set file info
+                fileInfoElement.innerHTML = `
+                    <div class="file-info-item"><strong>Jenis File:</strong> ${fileType}</div>
+                    <div class="file-info-item"><strong>Ukuran:</strong> ${fileUrl ? '1.2 MB' : 'Informasi ukuran tidak tersedia'}</div>
+                `;
+                
+                // Set download button
+                if (fileUrl) {
+                    downloadBtn.style.display = 'inline-flex';
+                    downloadBtn.onclick = function() {
+                        window.open(fileUrl, '_blank');
+                    };
+                } else {
+                    downloadBtn.style.display = 'none';
+                }
+                
+                // Clear previous content
+                container.innerHTML = '';
+                
+                // Determine file type and render accordingly
+                if (fileType.startsWith('image/')) {
+                    // Image preview
+                    const img = document.createElement('img');
+                    img.src = fileUrl || 'https://via.placeholder.com/600x400?text=Preview+Gambar';
+                    img.className = 'preview-image';
+                    img.alt = filename;
+                    container.appendChild(img);
+                } else if (fileType === 'application/pdf') {
+                    // PDF preview using PDF.js
+                    if (fileUrl) {
+                        // Load the PDF
+                        container.innerHTML = '<p>Memuat PDF...</p>';
+                        
+                        // Asynchronous download of PDF
+                        const loadingTask = pdfjsLib.getDocument(fileUrl);
+                        loadingTask.promise.then(function(pdf) {
+                            // Fetch the first page
+                            return pdf.getPage(1);
+                        }).then(function(page) {
+                            const scale = 1.5;
+                            const viewport = page.getViewport({ scale: scale });
+
+                            // Prepare canvas
+                            const canvas = document.createElement('canvas');
+                            const context = canvas.getContext('2d');
+                            canvas.height = viewport.height;
+                            canvas.width = viewport.width;
+                            
+                            // Clear container and add canvas
+                            container.innerHTML = '';
+                            container.appendChild(canvas);
+                            
+                            // Render PDF page into canvas context
+                            const renderContext = {
+                                canvasContext: context,
+                                viewport: viewport
+                            };
+                            
+                            page.render(renderContext);
+                            
+                            // Add page info
+                            const pageInfo = document.createElement('div');
+                            pageInfo.style.marginTop = '10px';
+                            pageInfo.style.fontSize = '14px';
+                            pageInfo.textContent = `Halaman 1 dari ${pdf.numPages}`;
+                            container.appendChild(pageInfo);
+                        }).catch(function(error) {
+                            container.innerHTML = '<div class="unsupported-file"><p>Gagal memuat PDF. Silakan download file untuk melihat.</p></div>';
+                            console.error('PDF.js error:', error);
+                        });
+                    } else {
+                        container.innerHTML = '<div class="unsupported-file"><p>PDF tidak tersedia untuk pratinjau. Silakan download file.</p></div>';
+                    }
+                } else if (fileType.startsWith('video/')) {
+                    // Video preview
+                    const video = document.createElement('video');
+                    video.src = fileUrl || '';
+                    video.controls = true;
+                    video.className = 'preview-image';
+                    container.appendChild(video);
+                } else if (fileType.startsWith('audio/')) {
+                    // Audio preview
+                    const audio = document.createElement('audio');
+                    audio.src = fileUrl || '';
+                    audio.controls = true;
+                    container.appendChild(audio);
+                } else if (fileType.includes('officedocument') || 
+                           fileType.includes('msword') || 
+                           fileType.includes('excel') || 
+                           fileType.includes('powerpoint') ||
+                           fileType.includes('text/plain')) {
+                    // Office documents or text files - show iframe preview if possible
+                    if (fileUrl) {
+                        const iframe = document.createElement('iframe');
+                        iframe.src = `https://docs.google.com/viewer?url=${encodeURIComponent(fileUrl)}&embedded=true`;
+                        iframe.className = 'preview-document';
+                        container.appendChild(iframe);
+                    } else {
+                        container.innerHTML = '<div class="unsupported-file"><p>Dokumen tidak tersedia untuk pratinjau. Silakan download file.</p></div>';
+                    }
+                } else {
+                    // Unsupported file type
+                    container.innerHTML = `
+                        <div class="unsupported-file">
+                            <i class="fas fa-file" style="font-size: 50px; margin-bottom: 15px;"></i>
+                            <p>Pratinjau tidak tersedia untuk jenis file ini.</p>
+                            <p>Silakan download file untuk melihat isinya.</p>
+                        </div>
+                    `;
+                }
+                
+                modal.style.display = 'flex';
+            }
+
+            // Tutup preview modal
+            document.getElementById('closePreview').addEventListener('click', function() {
+                document.getElementById('previewModal').style.display = 'none';
+            });
+
+            // Tampilkan detail tugas
+            function showTaskDetail(taskId) {
+                const tasks = getTasksFromStorage();
+                const task = tasks.find(t => t.id === taskId);
+                
+                if (!task) {
+                    alert('Tugas tidak ditemukan!');
+                    return;
+                }
+                
+                // Tampilkan detail tugas
+                document.getElementById('detail-task-title').textContent = task.title;
+                document.getElementById('detail-task-title').setAttribute('data-id', task.id);
+                document.getElementById('detail-task-deadline').textContent = `Batas waktu: ${formatDate(new Date(task.deadline))}`;
+                document.getElementById('detail-task-desc').textContent = task.description || 'Tidak ada deskripsi';
+                
+                // Render file lampiran
+                const filesContainer = document.getElementById('detail-task-files');
+                filesContainer.innerHTML = '';
+                
+                if (task.files && task.files.length > 0) {
+                    const filesTitle = document.createElement('h3');
+                    filesTitle.textContent = 'File Lampiran';
+                    filesContainer.appendChild(filesTitle);
+                    
+                    task.files.forEach(file => {
+                        const fileItem = document.createElement('div');
+                        fileItem.className = 'file-item';
+                        fileItem.innerHTML = `
+                            <i class="${getFileIcon(file.name)} file-icon"></i>
+                            <span class="file-name">${file.name}</span>
+                            <button class="file-download" data-name="${file.name}" data-type="${file.type}" data-url="${file.url || ''}">
+                                <i class="fas fa-download"></i>
+                            </button>
+                        `;
+                        filesContainer.appendChild(fileItem);
+                        
+                        // Tambahkan event listener untuk tombol download
+                        fileItem.querySelector('.file-download').addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            const fileName = this.getAttribute('data-name');
+                            const fileType = this.getAttribute('data-type');
+                            const fileUrl = this.getAttribute('data-url');
+                            previewFile(fileName, fileType, fileUrl);
+                        });
+                    });
+                }
+                
+                // Tampilkan halaman detail dan sembunyikan daftar
+                document.getElementById('tasks-container').style.display = 'none';
+                document.getElementById('task-detail').style.display = 'block';
+            }
+
+            // Kembali ke daftar tugas
+            document.getElementById('back-to-list').addEventListener('click', function() {
+                document.getElementById('tasks-container').style.display = 'grid';
+                document.getElementById('task-detail').style.display = 'none';
+            });
+
+            // Handle file upload for submission
+            const submissionFileInput = document.getElementById('submission-file');
+            const submissionFileList = document.getElementById('submission-file-list');
+            let submissionFiles = [];
+            
+            submissionFileInput.addEventListener('change', function(e) {
+                const files = Array.from(e.target.files);
+                files.forEach(file => {
+                    submissionFiles.push(file);
+                    
+                    const fileItem = document.createElement('div');
+                    fileItem.className = 'file-item';
+                    fileItem.innerHTML = `
+                        <i class="${getFileIcon(file.name)} file-icon"></i>
+                        <span class="file-name">${file.name}</span>
+                        <button class="file-remove" data-name="${file.name}">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+                    
+                    submissionFileList.appendChild(fileItem);
+                    
+                    // Add event listener to remove button
+                    fileItem.querySelector('.file-remove').addEventListener('click', function() {
+                        const fileName = this.getAttribute('data-name');
+                        submissionFiles = submissionFiles.filter(f => f.name !== fileName);
+                        submissionFileList.removeChild(fileItem);
+                    });
+                });
+                
+                // Reset input
+                submissionFileInput.value = '';
+            });
+
+            // Submit tugas
+            document.getElementById('submit-task').addEventListener('click', function() {
+                const submissionText = document.getElementById('submission-text').value;
+                const taskId = document.getElementById('detail-task-title').getAttribute('data-id');
+                
+                if (!submissionText && submissionFiles.length === 0) {
+                    alert('Harap isi jawaban atau lampirkan file!');
+                    return;
+                }
+                
+                // Simpan submission ke localStorage
+                const submissions = JSON.parse(localStorage.getItem('task_submissions')) || {};
+                const studentName = "Siswa 8D"; // Ini bisa diganti dengan nama siswa yang login
+                
+                if (!submissions[taskId]) {
+                    submissions[taskId] = [];
+                }
+                
+                submissions[taskId].push({
+                    studentName: studentName,
+                    text: submissionText,
+                    files: submissionFiles.map(file => ({
+                        name: file.name,
+                        size: file.size,
+                        type: file.type
+                    })),
+                    timestamp: new Date().toISOString()
+                });
+                
+                localStorage.setItem('task_submissions', JSON.stringify(submissions));
+                
+                alert('Tugas berhasil dikirim!');
+                
+                // Reset form
+                document.getElementById('submission-text').value = '';
+                submissionFileList.innerHTML = '';
+                submissionFiles = [];
+                
+                // Kembali ke daftar
+                document.getElementById('tasks-container').style.display = 'grid';
+                document.getElementById('task-detail').style.display = 'none';
+            });
+
+            // Inisialisasi render daftar tugas
+            renderTaskList();
+        });
+    </script>
+</body>
+</html>

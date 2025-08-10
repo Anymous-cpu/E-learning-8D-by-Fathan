@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dashboard Murid</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap');
+        
+        :root {
+            --primary: #5dadec;
+            --accent: #00f7ff;
+            --light: #e6f7ff;
+            --dark: #1a3a6a;
+            --glass: rgba(255, 255, 255, 0.15);
+            --neon-glow: 0 0 10px var(--accent);
+            --error: #ff6b6b;
+            --success: #2ecc71;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Zen Kaku Gothic New', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0a1a2e, #1a3a6a);
+            min-height: 100vh;
+            color: var(--light);
+            touch-action: manipulation;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Navigation Bar */
+        .navbar {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 15px;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .nav-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 
+                0 0 15px var(--primary),
+                inset 0 0 5px white;
+        }
+        
+        .logo-text {
+            font-weight: 500;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            font-size: 16px;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            overflow-x: auto;
+            gap: 8px;
+            padding-bottom: 5px;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .nav-tab {
+            color: var(--light);
+            text-decoration: none;
+            font-size: 13px;
+            padding: 8px 12px;
+            border-radius: 20px;
+            transition: all 0.3s;
+            white-space: nowrap;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .nav-tab.active {
+            background: var(--primary);
+            box-shadow: var(--neon-glow);
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-top: 110px; /* Adjusted for fixed navbar */
+            padding: 20px 15px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .page-title {
+            font-size: 22px;
+            margin-bottom: 5px;
+            color: var(--accent);
+        }
+        
+        .welcome-message {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        /* Action Buttons */
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .action-btn {
+            padding: 16px;
+            border-radius: 10px;
+            border: none;
+            font-size: 16px;
+            font-weight: 500;
+            text-align: center;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .action-btn i {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn-tugas {
+            background: var(--primary);
+        }
+        
+        .btn-kuis {
+            background: var(--accent);
+            color: var(--dark);
+        }
+        
+        .btn-jadwal {
+            background: var(--success);
+        }
+        
+        /* Background Elements */
+        .bg-elements {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .bg-element {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--primary), transparent 70%);
+            opacity: 0.1;
+            filter: blur(30px);
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Background Elements -->
+    <div class="bg-elements">
+        <div class="bg-element" style="width: 300px; height: 300px; top: -50px; left: -50px;"></div>
+        <div class="bg-element" style="width: 200px; height: 200px; bottom: -30px; right: -30px;"></div>
+    </div>
+    
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-header">
+            <div class="logo-icon">👨‍🎓</div>
+            <span class="logo-text">DASHBOARD MURID</span>
+        </div>
+        <div class="nav-tabs">
+            <a href="dashboard.html" class="nav-tab active">DASHBOARD</a>
+            <a href="kuis.html" class="nav-tab">KUIS</a>
+            <a href="tugas.html" class="nav-tab">TUGAS</a>
+            <a href="jadwal.html" class="nav-tab">JADWAL</a>
+            <a href="notifikasi.html" class="nav-tab">INFORMARSI</a>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="header">
+            <h1 class="page-title">DASHBOARD MURID</h1>
+            <p class="welcome-message" id="welcome-message">Selamat datang di sistem pembelajaran</p>
+        </div>
+        
+<div class="action-buttons">
+    <a href="tugas.html" class="action-btn btn-tugas">
+        <i class="fas fa-tasks"></i> TUGAS
+    </a>
+    <a href="kuis.html" class="action-btn btn-kuis">
+        <i class="fas fa-question-circle"></i> KUIS
+    </a>
+    <a href="jadwal.html" class="action-btn btn-jadwal">
+        <i class="fas fa-calendar-alt"></i> JADWAL MAPEL
+    </a>
+    <a href="notifikasi.html" class="action-btn btn-notifikasi">
+        <i class="fas fa-bell"></i> NOTIFIKASI
+    </a>
+</div>
+</main>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Dynamic font sizing
+            const baseFontSize = window.innerWidth < 400 ? 14 : 16;
+            document.documentElement.style.fontSize = baseFontSize + 'px';
+            
+            // Touch feedback for buttons
+            const buttons = document.querySelectorAll('.action-btn, .nav-tab');
+            buttons.forEach(btn => {
+                btn.addEventListener('touchstart', function() {
+                    this.style.transform = 'scale(0.95)';
+                });
+                btn.addEventListener('touchend', function() {
+                    this.style.transform = '';
+                });
+            });
+            
+            // Prevent zooming
+            document.addEventListener('gesturestart', function(e) {
+                e.preventDefault();
+            });
+            
+            // Show student name
+            const studentName = localStorage.getItem('current_student');
+            if (!studentName) {
+                window.location.href = "index.html";
+            } else {
+                document.getElementById('welcome-message').textContent = `Selamat datang, ${studentName}`;
+            }
+        });
+    </script>
+</body>
+</html>

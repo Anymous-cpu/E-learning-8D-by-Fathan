@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Data Kuis 8D | Guru</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap');
+        @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css');
+        
+        :root {
+            --primary: #5dadec;
+            --accent: #00f7ff;
+            --light: #e6f7ff;
+            --dark: #1a3a6a;
+            --glass: rgba(255, 255, 255, 0.15);
+            --neon-glow: 0 0 10px var(--accent);
+            --error: #ff6b6b;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --gold: #FFD700;
+            --silver: #C0C0C0;
+            --bronze: #CD7F32;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Zen Kaku Gothic New', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0a1a2e, #1a3a6a);
+            min-height: 100vh;
+            color: var(--light);
+            touch-action: manipulation;
+        }
+        
+        .navbar {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 15px;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 15px var(--primary), inset 0 0 5px white;
+        }
+        
+        .nav-links {
+            display: flex;
+            overflow-x: auto;
+            gap: 8px;
+            padding-bottom: 5px;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .nav-link {
+            color: var(--light);
+            text-decoration: none;
+            font-size: 13px;
+            padding: 8px 12px;
+            border-radius: 20px;
+            transition: all 0.3s;
+            white-space: nowrap;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .nav-link.active {
+            background: var(--primary);
+            box-shadow: var(--neon-glow);
+        }
+        
+        .container {
+            margin-top: 100px;
+            padding: 15px;
+            padding-bottom: 80px;
+        }
+        
+        .header-section {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        h1 {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+        
+        .quiz-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .quiz-btn {
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .quiz-btn.active {
+            background: var(--primary);
+            box-shadow: var(--neon-glow);
+        }
+        
+        .quiz-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .results-container {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .quiz-title {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+        
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .results-table th, 
+        .results-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .results-table th {
+            background: rgba(0, 0, 0, 0.2);
+            font-weight: 500;
+        }
+        
+        .results-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .results-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .rank-1 {
+            background: rgba(255, 215, 0, 0.15);
+        }
+        
+        .rank-2 {
+            background: rgba(192, 192, 192, 0.15);
+        }
+        
+        .rank-3 {
+            background: rgba(205, 127, 50, 0.15);
+        }
+        
+        .rank-badge {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        
+        .rank-1 .rank-badge {
+            background: var(--gold);
+            color: var(--dark);
+            box-shadow: 0 0 8px var(--gold);
+        }
+        
+        .rank-2 .rank-badge {
+            background: var(--silver);
+            color: var(--dark);
+            box-shadow: 0 0 8px var(--silver);
+        }
+        
+        .rank-3 .rank-badge {
+            background: var(--bronze);
+            color: white;
+            box-shadow: 0 0 8px var(--bronze);
+        }
+        
+        .score-cell {
+            font-weight: 500;
+        }
+        
+        .score-high {
+            color: var(--success);
+        }
+        
+        .score-medium {
+            color: var(--warning);
+        }
+        
+        .score-low {
+            color: var(--error);
+        }
+        
+        .duration-cell {
+            font-family: monospace;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 30px;
+            opacity: 0.7;
+        }
+        
+        .top-students {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .top-student-card {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 15px;
+            width: 30%;
+            min-width: 200px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .top-student-rank {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .rank-1-badge {
+            background: var(--gold);
+            color: var(--dark);
+            box-shadow: 0 0 15px var(--gold);
+        }
+        
+        .rank-2-badge {
+            background: var(--silver);
+            color: var(--dark);
+            box-shadow: 0 0 15px var(--silver);
+        }
+        
+        .rank-3-badge {
+            background: var(--bronze);
+            color: white;
+            box-shadow: 0 0 15px var(--bronze);
+        }
+        
+        .top-student-name {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        .top-student-score {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .score-1 {
+            color: var(--gold);
+        }
+        
+        .score-2 {
+            color: var(--silver);
+        }
+        
+        .score-3 {
+            color: var(--bronze);
+        }
+        
+        @media (max-width: 768px) {
+            .results-table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .quiz-selector {
+                flex-direction: column;
+            }
+            
+            .top-student-card {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Elements -->
+    <div class="bg-elements">
+        <div class="bg-element" style="width: 300px; height: 300px; top: -50px; left: -50px;"></div>
+        <div class="bg-element" style="width: 200px; height: 200px; bottom: -30px; right: -30px;"></div>
+    </div>
+    
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="logo">
+            <div class="logo-icon">👨‍🏫</div>
+            <span class="logo-text">DATA KUIS 8D</span>
+        </div>
+        <div class="nav-links">
+            <a href="manajemen.html" class="nav-link">MANAJEMEN</a>
+            <a href="create-kuis.html" class="nav-link">BUAT KUIS</a>
+            <a href="create-tugas.html" class="nav-link">BUAT TUGAS</a>
+            <a href="pengumuman.html" class="nav-link">PENGUMUMAN</a>
+            <a href="data-tugas.html" class="nav-link">DATA TUGAS</a>
+             <a href="data-kuis.html" class="nav-link active">DATA KUIS</a>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <div class="container">
+        <section class="header-section">
+            <h1>Data Hasil Kuis Kelas 8D</h1>
+            <p>Lihat hasil pengerjaan kuis oleh siswa</p>
+        </section>
+        
+        <div class="quiz-selector" id="quiz-selector">
+            <button class="quiz-btn active" id="all-quizzes-btn">Semua Kuis</button>
+        </div>
+        
+        <div id="top-students-display">
+            <!-- Top students will be shown here -->
+        </div>
+        
+        <div id="results-display">
+            <!-- Results will be loaded here -->
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Dynamic font sizing
+            const baseFontSize = window.innerWidth < 400 ? 14 : 16;
+            document.documentElement.style.fontSize = baseFontSize + 'px';
+            
+            // DOM Elements
+            const quizSelector = document.getElementById('quiz-selector');
+            const resultsDisplay = document.getElementById('results-display');
+            const topStudentsDisplay = document.getElementById('top-students-display');
+            const allQuizzesBtn = document.getElementById('all-quizzes-btn');
+            
+            // Auto-delete old quiz results (3 hours)
+            function autoDeleteOldResults() {
+                const allResults = JSON.parse(localStorage.getItem('quiz_results')) || {};
+                const now = new Date().getTime();
+                const threeHours = 3 * 60 * 60 * 1000; // 3 hours in milliseconds
+                
+                for (const [quizId, results] of Object.entries(allResults)) {
+                    const updatedResults = results.filter(result => {
+                        const resultTime = new Date(result.timestamp).getTime();
+                        return (now - resultTime) <= threeHours;
+                    });
+                    
+                    if (updatedResults.length === 0) {
+                        delete allResults[quizId];
+                    } else {
+                        allResults[quizId] = updatedResults;
+                    }
+                }
+                
+                localStorage.setItem('quiz_results', JSON.stringify(allResults));
+            }
+            
+            // Load all quiz results
+            function loadQuizResults() {
+                // First auto-delete old results
+                autoDeleteOldResults();
+                
+                // Get all results from localStorage
+                const allResults = JSON.parse(localStorage.getItem('quiz_results')) || {};
+                const quizzes = JSON.parse(localStorage.getItem('teacher_quizzes')) || {};
+                
+                // Clear displays
+                resultsDisplay.innerHTML = '';
+                topStudentsDisplay.innerHTML = '';
+                
+                // Show all results by default
+                showAllResults(quizzes, allResults);
+            }
+            
+            // Show results for all quizzes
+            function showAllResults(quizzes, allResults) {
+                // Set active button
+                setActiveButton('Semua Kuis');
+                
+                let hasResults = false;
+                let allClassResults = [];
+                
+                // Process each quiz
+                for (const [quizId, results] of Object.entries(allResults)) {
+                    const quizTitle = quizzes[quizId]?.title || "Kuis Tidak Ditemukan";
+                    
+                    // Filter only 8D students
+                    const classResults = results.filter(r => r.studentName.includes('8D'));
+                    if (classResults.length === 0) continue;
+                    
+                    hasResults = true;
+                    
+                    // Add to all results for top students calculation
+                    allClassResults = allClassResults.concat(classResults.map(r => ({
+                        ...r,
+                        quizTitle: quizTitle
+                    })));
+                }
+                
+                if (!hasResults) {
+                    showNoResults();
+                    return;
+                }
+                
+                // Calculate top students across all quizzes
+                const studentScores = {};
+                
+                allClassResults.forEach(result => {
+                    if (!studentScores[result.studentName]) {
+                        studentScores[result.studentName] = {
+                            totalScore: 0,
+                            quizCount: 0,
+                            name: result.studentName.replace(' (8D)', '')
+                        };
+                    }
+                    studentScores[result.studentName].totalScore += result.score;
+                    studentScores[result.studentName].quizCount++;
+                });
+                
+                // Calculate average scores
+                const studentsWithAverages = Object.values(studentScores).map(student => ({
+                    name: student.name,
+                    averageScore: Math.round(student.totalScore / student.quizCount)
+                }));
+                
+                // Sort by average score
+                const topStudents = studentsWithAverages.sort((a, b) => b.averageScore - a.averageScore).slice(0, 3);
+                
+                // Display top students
+                displayTopStudents(topStudents);
+                
+                // Create quiz results container
+                const container = document.createElement('div');
+                container.className = 'results-container';
+                
+                // Add title
+                const title = document.createElement('div');
+                title.className = 'quiz-title';
+                title.textContent = 'Hasil Semua Kuis';
+                container.appendChild(title);
+                
+                // Create table
+                const table = document.createElement('table');
+                table.className = 'results-table';
+                
+                // Create table header
+                const thead = document.createElement('thead');
+                thead.innerHTML = `
+                    <tr>
+                        <th>Kuis</th>
+                        <th>Nama Siswa</th>
+                        <th>Benar</th>
+                        <th>Salah</th>
+                        <th>Skor</th>
+                        <th>Waktu</th>
+                        <th>Tanggal</th>
+                    </tr>
+                `;
+                table.appendChild(thead);
+                
+                // Create table body
+                const tbody = document.createElement('tbody');
+                
+                // Add each student's result
+                allClassResults.forEach(result => {
+                    const row = document.createElement('tr');
+                    
+                    // Calculate correct and wrong answers
+                    const correct = result.correct || Math.round((result.score / 100) * (result.totalQuestions || 1));
+                    const wrong = (result.totalQuestions || 1) - correct;
+                    
+                    // Format duration
+                    const duration = result.duration ? formatDuration(result.duration) : '-';
+                    
+                    row.innerHTML = `
+                        <td>${result.quizTitle || quizzes[result.quizId]?.title || 'Kuis'}</td>
+                        <td>${result.studentName.replace(' (8D)', '')}</td>
+                        <td>${correct}</td>
+                        <td>${wrong}</td>
+                        <td class="score-cell ${getScoreClass(result.score)}">${result.score}%</td>
+                        <td class="duration-cell">${duration}</td>
+                        <td>${new Date(result.timestamp).toLocaleDateString()}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+                
+                table.appendChild(tbody);
+                container.appendChild(table);
+                resultsDisplay.appendChild(container);
+            }
+            
+            // Display top 3 students
+            function displayTopStudents(topStudents) {
+                if (topStudents.length === 0) return;
+                
+                const container = document.createElement('div');
+                container.className = 'results-container';
+                
+                const title = document.createElement('div');
+                title.className = 'quiz-title';
+                title.textContent = 'Siswa Terbaik';
+                container.appendChild(title);
+                
+                const topStudentsDiv = document.createElement('div');
+                topStudentsDiv.className = 'top-students';
+                
+                topStudents.forEach((student, index) => {
+                    const studentCard = document.createElement('div');
+                    studentCard.className = 'top-student-card';
+                    
+                    const rankClass = `rank-${index + 1}-badge`;
+                    const scoreClass = `score-${index + 1}`;
+                    
+                    studentCard.innerHTML = `
+                        <div class="top-student-rank ${rankClass}">${index + 1}</div>
+                        <div class="top-student-name">${student.name}</div>
+                        <div class="top-student-score ${scoreClass}">${student.averageScore}%</div>
+                    `;
+                    
+                    topStudentsDiv.appendChild(studentCard);
+                });
+                
+                container.appendChild(topStudentsDiv);
+                topStudentsDisplay.appendChild(container);
+            }
+            
+            // Show no results message
+            function showNoResults() {
+                const noResults = document.createElement('div');
+                noResults.className = 'no-results';
+                noResults.innerHTML = `
+                    <i class="fas fa-info-circle" style="font-size: 24px; margin-bottom: 10px;"></i>
+                    <p>Tidak ada data hasil kuis yang ditemukan</p>
+                `;
+                resultsDisplay.appendChild(noResults);
+            }
+            
+            // Helper function to set active button
+            function setActiveButton(buttonText) {
+                document.querySelectorAll('.quiz-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.textContent === buttonText);
+                });
+            }
+            
+            // Helper function to get score class
+            function getScoreClass(score) {
+                if (score >= 80) return 'score-high';
+                if (score >= 60) return 'score-medium';
+                return 'score-low';
+            }
+            
+            // Helper function to format duration (seconds to MM:SS)
+            function formatDuration(seconds) {
+                const mins = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }
+            
+            // Event listener for all quizzes button
+            allQuizzesBtn.addEventListener('click', function() {
+                const quizzes = JSON.parse(localStorage.getItem('teacher_quizzes')) || {};
+                const allResults = JSON.parse(localStorage.getItem('quiz_results')) || {};
+                showAllResults(quizzes, allResults);
+            });
+            
+            // Initialize
+            loadQuizResults();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Jadwal Kelas 8D</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap');
+        @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css');
+        
+        :root {
+            --primary: #5dadec;
+            --accent: #00f7ff;
+            --light: #e6f7ff;
+            --dark: #1a3a6a;
+            --glass: rgba(255, 255, 255, 0.15);
+            --neon-glow: 0 0 10px var(--accent);
+            --seni: #FF9FF3;
+            --ipa: #1DD1A1;
+            --ips: #FECA57;
+            --mtk: #FF6B6B;
+            --bing: #48DBFB;
+            --bindo: #5f27cd;
+            --agama: #576574;
+            --pjok: #10AC84;
+            --ppkn: #8395a7;
+            --tik: #0abde3;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Zen Kaku Gothic New', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0a1a2e, #1a3a6a);
+            min-height: 100vh;
+            color: var(--light);
+            touch-action: manipulation;
+        }
+        
+        .navbar {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 15px;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 15px var(--primary), inset 0 0 5px white;
+        }
+        
+        .nav-links {
+            display: flex;
+            overflow-x: auto;
+            gap: 8px;
+            padding-bottom: 5px;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .nav-link {
+            color: var(--light);
+            text-decoration: none;
+            font-size: 13px;
+            padding: 8px 12px;
+            border-radius: 20px;
+            transition: all 0.3s;
+            white-space: nowrap;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .nav-link.active {
+            background: var(--primary);
+            box-shadow: var(--neon-glow);
+        }
+        
+        .container {
+            margin-top: 100px;
+            padding: 15px;
+            padding-bottom: 80px;
+        }
+        
+        .header-section {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+        
+        .current-day {
+            color: var(--accent);
+            font-weight: 500;
+            margin-top: 5px;
+        }
+        
+        .schedule-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .day-card {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s;
+        }
+        
+        .day-card.active {
+            border-color: var(--accent);
+            box-shadow: var(--neon-glow);
+        }
+        
+        .day-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        
+        .day-name {
+            font-weight: 500;
+            font-size: 16px;
+        }
+        
+        .day-toggle {
+            color: var(--accent);
+            transition: transform 0.3s;
+        }
+        
+        .day-card.active .day-toggle {
+            transform: rotate(180deg);
+        }
+        
+        .subjects-container {
+            display: grid;
+            gap: 10px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        
+        .day-card.active .subjects-container {
+            max-height: 1000px;
+        }
+        
+        .subject-card {
+            display: flex;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .subject-hours {
+            width: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        
+        .subject-details {
+            flex: 1;
+            padding: 10px;
+        }
+        
+        .subject-name {
+            font-weight: 500;
+            margin-bottom: 3px;
+        }
+        
+        .subject-teacher {
+            font-size: 12px;
+            opacity: 0.8;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .bg-elements {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .bg-element {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--primary), transparent 70%);
+            opacity: 0.1;
+            filter: blur(30px);
+        }
+        
+        /* Subject Colors */
+        .seni-budaya { background: var(--seni); }
+        .ipa { background: var(--ipa); }
+        .ips { background: var(--ips); }
+        .mtk { background: var(--mtk); }
+        .binggris { background: var(--bing); }
+        .bindo { background: var(--bindo); }
+        .agama { background: var(--agama); }
+        .pjok { background: var(--pjok); }
+        .ppkn { background: var(--ppkn); }
+        .tik { background: var(--tik); }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin-top: 90px;
+                padding: 10px;
+            }
+            
+            .subject-card {
+                flex-direction: column;
+            }
+            
+            .subject-hours {
+                width: 100%;
+                padding: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Elements -->
+    <div class="bg-elements">
+        <div class="bg-element" style="width: 300px; height: 300px; top: -50px; left: -50px;"></div>
+        <div class="bg-element" style="width: 200px; height: 200px; bottom: -30px; right: -30px;"></div>
+    </div>
+    
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="logo">
+            <div class="logo-icon"></div>
+            <span class="logo-text">JADWAL KELAS 8D</span>
+        </div>
+        <div class="nav-links">
+            <a href="dashboard.html" class="nav-link">DASHBOARD</a>
+            <a href="kuis.html" class="nav-link">KUIS</a>
+            <a href="tugas.html" class="nav-link">TUGAS</a>
+            <a href="jadwal.html" class="nav-link active">JADWAL</a>
+            <a href="notifikasi.html" class="nav-link">INFORMASI</a>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <div class="container">
+        <section class="header-section">
+            <h1>Jadwal Pelajaran</h1>
+            <div class="current-day" id="current-day"></div>
+        </section>
+        
+        <div class="schedule-container" id="schedule-container">
+            <!-- Jadwal akan dimuat di sini -->
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ukuran font dinamis
+            const baseFontSize = window.innerWidth < 400 ? 14 : 16;
+            document.documentElement.style.fontSize = baseFontSize + 'px';
+            
+            // Data jadwal
+            const scheduleData = [
+                {
+                    day: "Senin",
+                    subjects: [
+                        { hours: "3 jam", name: "Seni Budaya", teacher: "Bu Puri", type: "seni-budaya" },
+                        { hours: "3 jam", name: "IPA", teacher: "Bu Bekti", type: "ipa" },
+                        { hours: "2 jam", name: "IPS", teacher: "Bu Nurma", type: "ips" }
+                    ]
+                },
+                {
+                    day: "Selasa",
+                    subjects: [
+                        { hours: "3 jam", name: "Matematika", teacher: "Bu Ezra", type: "mtk" },
+                        { hours: "2 jam", name: "Bahasa Inggris", teacher: "Ma'am Sari", type: "binggris" },
+                        { hours: "2 jam", name: "IPS", teacher: "Bu Nurma", type: "ips" },
+                        { hours: "2 jam", name: "Bahasa Indonesia", teacher: "Pak Gilang", type: "bindo" }
+                    ]
+                },
+                {
+                    day: "Rabu",
+                    subjects: [
+                        { hours: "3 jam", name: "Agama", teacher: "Bu Anti", type: "agama" },
+                        { hours: "3 jam", name: "PJOK", teacher: "Pak Andre", type: "pjok" },
+                        { hours: "2 jam", name: "Bahasa Indonesia", teacher: "Pak Gilang", type: "bindo" }
+                    ]
+                },
+                {
+                    day: "Kamis",
+                    subjects: [
+                        { hours: "2 jam", name: "Bahasa Indonesia", teacher: "Pak Gilang", type: "bindo" },
+                        { hours: "3 jam", name: "PPKn", teacher: "Pak Agung", type: "ppkn" },
+                        { hours: "3 jam", name: "TIK", teacher: "Bu Lidya", type: "tik" }
+                    ]
+                },
+                {
+                    day: "Jumat",
+                    subjects: [
+                        { hours: "2 jam", name: "Matematika", teacher: "Bu Ezra", type: "mtk" },
+                        { hours: "2 jam", name: "IPA", teacher: "Bu Bekti", type: "ipa" },
+                        { hours: "2 jam", name: "Bahasa Inggris", teacher: "Ma'am Sari", type: "binggris" }
+                    ]
+                }
+            ];
+            
+            // Tampilkan hari ini
+            const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const today = new Date().getDay();
+            document.getElementById('current-day').textContent = `Hari Ini: ${days[today]}`;
+            
+            // Render jadwal
+            const scheduleContainer = document.getElementById('schedule-container');
+            
+            scheduleData.forEach((dayData, index) => {
+                const dayCard = document.createElement('div');
+                dayCard.className = `day-card ${index === today - 1 ? 'active' : ''}`;
+                
+                dayCard.innerHTML = `
+                    <div class="day-header">
+                        <div class="day-name">${dayData.day}</div>
+                        <div class="day-toggle">
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
+                    <div class="subjects-container">
+                        ${dayData.subjects.map(subject => `
+                            <div class="subject-card">
+                                <div class="subject-hours ${subject.type}">${subject.hours}</div>
+                                <div class="subject-details">
+                                    <div class="subject-name">${subject.name}</div>
+                                    <div class="subject-teacher">
+                                        <i class="fas fa-chalkboard-teacher"></i>
+                                        ${subject.teacher}
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                
+                // Toggle day card
+                dayCard.querySelector('.day-header').addEventListener('click', function() {
+                    dayCard.classList.toggle('active');
+                });
+                
+                scheduleContainer.appendChild(dayCard);
+            });
+            
+            // Auto-scroll to today's schedule
+            if (today >= 1 && today <= 5) {
+                const activeCard = document.querySelectorAll('.day-card')[today - 1];
+                activeCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        });
+    </script>
+</body>
+</html>
