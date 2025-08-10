@@ -420,9 +420,10 @@
                 e.preventDefault();
             });
 
-            // Ambil kuis dari localStorage (simulasi data dari server)
+            // Ambil kuis dari localStorage
             function getQuizzesFromStorage() {
-                return JSON.parse(localStorage.getItem('teacher_quizzes')) || [];
+                const quizzes = JSON.parse(localStorage.getItem('teacher_quizzes')) || {};
+                return Object.values(quizzes); // Konversi object ke array
             }
 
             // Render daftar kuis
@@ -573,125 +574,4 @@
                 });
                 
                 // Hitung skor
-                const totalQuestions = quiz.questions.length;
-                const score = Math.round((correct / totalQuestions) * 100);
-                
-                // Tampilkan hasil
-                showQuizResult(score, correct, totalQuestions);
-                
-                // Simpan hasil (simulasi)
-                saveQuizResult(quizId, quiz.title, score);
-            });
-
-            // Simpan hasil kuis
-            function saveQuizResult(quizId, quizTitle, score) {
-                const studentName = localStorage.getItem('current_student') || "Murid Tanpa Nama";
-                const results = JSON.parse(localStorage.getItem('quiz_results')) || {};
-                
-                if (!results[quizId]) {
-                    results[quizId] = [];
-                }
-                
-                // Cek apakah siswa sudah mengerjakan kuis ini sebelumnya
-                const existingIndex = results[quizId].findIndex(r => r.studentName === studentName);
-                const result = {
-                    studentName: studentName,
-                    quizTitle: quizTitle,
-                    score: score,
-                    timestamp: new Date().toISOString()
-                };
-                
-                if (existingIndex >= 0) {
-                    results[quizId][existingIndex] = result; // Update existing
-                } else {
-                    results[quizId].push(result); // Add new
-                }
-                
-                localStorage.setItem('quiz_results', JSON.stringify(results));
-            }
-
-            // Tampilkan hasil kuis
-            function showQuizResult(score, correct, total) {
-                document.getElementById('quiz-detail').style.display = 'none';
-                resultView.style.display = 'block';
-                
-                const scoreElement = document.getElementById('score-value');
-                scoreElement.textContent = score;
-                
-                // Set warna skor
-                let scoreClass = 'score-medium';
-                if (score >= 80) scoreClass = 'score-high';
-                else if (score < 60) scoreClass = 'score-low';
-                
-                scoreElement.className = scoreClass;
-                
-                // Set pesan hasil
-                document.getElementById('result-message').textContent = `Anda menjawab ${correct} dari ${total} soal dengan benar`;
-            }
-
-            // Kembali ke daftar kuis dari hasil
-            document.getElementById('back-to-quizzes').addEventListener('click', function() {
-                resultView.style.display = 'none';
-                document.getElementById('quizzes-container').style.display = 'grid';
-                renderQuizList();
-            });
-
-            // Inisialisasi render daftar kuis
-            renderQuizList();
-            
-            // Sample data for testing (can be removed in production)
-            function initializeSampleQuizzes() {
-                if (!localStorage.getItem('teacher_quizzes')) {
-                    const sampleQuizzes = [
-                        {
-                            id: "kuis1",
-                            title: "Matematika - Bab Aljabar",
-                            description: "Kuis tentang dasar-dasar aljabar",
-                            deadline: "2023-12-31T23:59:59",
-                            questions: [
-                                {
-                                    id: 1,
-                                    question: "Berapa hasil dari 2x + 3 = 11?",
-                                    type: "multiple",
-                                    options: ["x = 4", "x = 5", "x = 6", "x = 7"],
-                                    correctAnswer: 0
-                                },
-                                {
-                                    id: 2,
-                                    question: "Sederhanakan: 3(x + 4) - 2x",
-                                    type: "essay",
-                                    correctAnswer: "x + 12"
-                                }
-                            ]
-                        },
-                        {
-                            id: "kuis2",
-                            title: "IPA - Sistem Tata Surya",
-                            description: "Kuis tentang planet dan tata surya",
-                            deadline: "2023-12-31T23:59:59",
-                            questions: [
-                                {
-                                    id: 1,
-                                    question: "Planet terdekat dari matahari adalah?",
-                                    type: "multiple",
-                                    options: ["Venus", "Mars", "Mercury", "Bumi"],
-                                    correctAnswer: 2
-                                },
-                                {
-                                    id: 2,
-                                    question: "Jelaskan mengapa bumi bisa mendukung kehidupan?",
-                                    type: "essay"
-                                }
-                            ]
-                        }
-                    ];
-                    
-                    localStorage.setItem('teacher_quizzes', JSON.stringify(sampleQuizzes));
-                }
-            }
-            
-            initializeSampleQuizzes();
-        });
-    </script>
-</body>
-</html>
+                const totalQuestions = quiz.qu
