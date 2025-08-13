@@ -389,6 +389,84 @@
         .hidden {
             display: none;
         }
+
+        /* Modal untuk kode kuis */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: var(--dark);
+            border-radius: 12px;
+            padding: 20px;
+            width: 90%;
+            max-width: 400px;
+            border: 1px solid var(--primary);
+            box-shadow: 0 0 20px rgba(93, 173, 236, 0.5);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .modal-title {
+            color: var(--accent);
+            font-size: 18px;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            color: var(--light);
+            font-size: 20px;
+            cursor: pointer;
+        }
+        
+        .quiz-code-display {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: var(--accent);
+            margin: 15px 0;
+            border: 1px dashed var(--accent);
+        }
+        
+        .modal-actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
@@ -408,10 +486,8 @@
         <div class="nav-links">
             <a href="manajemen.html" class="nav-link">MANAJEMEN</a>
             <a href="create-kuis.html" class="nav-link active">BUAT KUIS</a>
-            <a href="create-tugas.html" class="nav-link">BUAT TUGAS</a>
             <a href="pengumuman.html" class="nav-link">PENGUMUMAN</a>
-            <a href="data-tugas.html" class="nav-link">DATA TUGAS</a>
-             <a href="data-kuis.html" class="nav-link">DATA KUIS</a>
+            <a href="data-kuis.html" class="nav-link">DATA KUIS</a>
         </div>
     </nav>
     
@@ -434,6 +510,10 @@
             <div class="form-control">
                 <label for="quiz-deadline">Batas Waktu Pengerjaan</label>
                 <input type="datetime-local" id="quiz-deadline">
+            </div>
+            <div class="form-control">
+                <label for="quiz-duration">Durasi (menit, 0 untuk tidak dibatasi)</label>
+                <input type="number" id="quiz-duration" min="0" value="0">
             </div>
         </div>
         
@@ -461,38 +541,46 @@
         </div>
     </div>
     
+    <!-- Modal untuk kode kuis -->
+    <div class="modal" id="quiz-code-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Kuis Berhasil Dipublikasikan!</h3>
+                <button class="close-modal" id="close-modal">&times;</button>
+            </div>
+            <p>Berikan kode berikut kepada siswa untuk mengikuti kuis:</p>
+            <div class="quiz-code-display" id="quiz-code-value">KUIS-ABCDEF</div>
+            <div class="modal-actions">
+                <button class="btn btn-accent" id="copy-code">
+                    <i class="fas fa-copy"></i> Salin Kode
+                </button>
+                <button class="btn btn-primary" id="view-quiz">
+                    <i class="fas fa-eye"></i> Lihat Kuis
+                </button>
+            </div>
+        </div>
+    </div>
+    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Ukuran font dinamis
-            const baseFontSize = window.innerWidth < 400 ? 14 : 16;
-            document.documentElement.style.fontSize = baseFontSize + 'px';
+            // Cek role user (simulasi)
+            const userRole = localStorage.getItem('userRole') || 'teacher';
             
-            // Touch feedback untuk tombol
-            const buttons = document.querySelectorAll('.btn, .nav-link');
-            buttons.forEach(btn => {
-                btn.addEventListener('touchstart', function() {
-                    this.style.transform = 'scale(0.95)';
-                });
-                btn.addEventListener('touchend', function() {
-                    this.style.transform = '';
-                });
-            });
-            
-            // Mencegah zoom
-            document.addEventListener('gesturestart', function(e) {
-                e.preventDefault();
-            });
+            if (userRole !== 'teacher') {
+                window.location.href = 'unauthorized.html';
+                return;
+            }
 
             // Simpan kuis ke localStorage
             function saveQuizToStorage(quiz) {
-                let quizzes = JSON.parse(localStorage.getItem('teacher_quizzes')) || {};
-                quizzes[quiz.id] = quiz;
+                let quizzes = JSON.parse(localStorage.getItem('teacher_quizzes')) || [];
+                quizzes.push(quiz);
                 localStorage.setItem('teacher_quizzes', JSON.stringify(quizzes));
             }
 
             // Ambil kuis dari localStorage
             function getQuizzesFromStorage() {
-                return JSON.parse(localStorage.getItem('teacher_quizzes')) || {};
+                return JSON.parse(localStorage.getItem('teacher_quizzes')) || [];
             }
 
             // Render daftar kuis
@@ -500,19 +588,35 @@
                 const quizzes = getQuizzesFromStorage();
                 const container = document.getElementById('published-quizzes');
                 
-                container.innerHTML = Object.values(quizzes).map(quiz => `
-                    <div class="quiz-card">
-                        <div class="quiz-title">${quiz.title}</div>
-                        <div class="quiz-meta">
-                            <span>Batas: ${new Date(quiz.deadline).toLocaleString()}</span>
-                            <span>${quiz.questions.length} Pertanyaan</span>
+                if (quizzes.length === 0) {
+                    container.innerHTML = '<p>Belum ada kuis yang dibuat</p>';
+                    return;
+                }
+                
+                container.innerHTML = quizzes.map(quiz => {
+                    const deadline = new Date(quiz.deadline);
+                    const now = new Date();
+                    const isExpired = deadline < now;
+                    
+                    return `
+                        <div class="quiz-card" data-quiz-id="${quiz.id}">
+                            <div class="quiz-title">${quiz.title}</div>
+                            <div class="quiz-meta">
+                                <span><i class="fas fa-clock"></i> ${new Date(quiz.deadline).toLocaleString()}</span>
+                                <span><i class="fas fa-question-circle"></i> ${quiz.questions.length} Pertanyaan</span>
+                                <span style="color: ${isExpired ? 'var(--error)' : 'var(--success)'}">
+                                    ${isExpired ? 'Selesai' : 'Aktif'}
+                                </span>
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <span style="font-size: 12px; background: rgba(0, 247, 255, 0.1); padding: 4px 8px; border-radius: 10px;">
+                                    <i class="fas fa-key"></i> ${quiz.code}
+                                </span>
+                            </div>
                         </div>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
             }
-
-            // Inisialisasi render
-            renderPublishedQuizzes();
 
             // Counter untuk pertanyaan
             let questionCounter = 0;
@@ -541,8 +645,11 @@
                         <button class="question-type-btn active" data-type="multiple" data-question-id="${questionId}">
                             <i class="fas fa-list-ul"></i> Pilihan Ganda
                         </button>
+                        <button class="question-type-btn" data-type="short" data-question-id="${questionId}">
+                            <i class="fas fa-pen"></i> Isian Singkat
+                        </button>
                         <button class="question-type-btn" data-type="essay" data-question-id="${questionId}">
-                            <i class="fas fa-pen"></i> Isian
+                            <i class="fas fa-align-left"></i> Essay
                         </button>
                     </div>
                     <div class="form-control multiple-options" id="${questionId}-multiple">
@@ -561,9 +668,17 @@
                             <i class="fas fa-plus"></i> Tambah Pilihan
                         </button>
                     </div>
-                    <div class="form-control essay-answer hidden" id="${questionId}-essay">
+                    <div class="form-control short-answer hidden" id="${questionId}-short">
                         <label>Jawaban yang Diharapkan</label>
                         <input type="text" class="essay-answer" placeholder="Masukkan jawaban yang diharapkan">
+                    </div>
+                    <div class="form-control essay-answer hidden" id="${questionId}-essay">
+                        <label>Pedoman Jawaban (opsional)</label>
+                        <textarea class="essay-answer" placeholder="Masukkan pedoman untuk jawaban essay"></textarea>
+                    </div>
+                    <div class="form-control">
+                        <label for="${questionId}-points">Poin</label>
+                        <input type="number" id="${questionId}-points" min="1" value="1">
                     </div>
                 `;
                 
@@ -602,14 +717,13 @@
                         typeButtons.forEach(btn => btn.classList.remove('active'));
                         this.classList.add('active');
                         
+                        // Sembunyikan semua tipe pertanyaan
+                        document.getElementById(`${questionId}-multiple`).classList.add('hidden');
+                        document.getElementById(`${questionId}-short`).classList.add('hidden');
+                        document.getElementById(`${questionId}-essay`).classList.add('hidden');
+                        
                         // Tampilkan jenis pertanyaan yang sesuai
-                        if (type === 'multiple') {
-                            document.getElementById(`${questionId}-multiple`).classList.remove('hidden');
-                            document.getElementById(`${questionId}-essay`).classList.add('hidden');
-                        } else {
-                            document.getElementById(`${questionId}-multiple`).classList.add('hidden');
-                            document.getElementById(`${questionId}-essay`).classList.remove('hidden');
-                        }
+                        document.getElementById(`${questionId}-${type}`).classList.remove('hidden');
                     });
                 });
             });
@@ -623,11 +737,24 @@
                 questionCounter = questions.length;
             }
 
+            // Generate kode kuis acak
+            function generateQuizCode() {
+                const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+                let result = 'KUIS-';
+                
+                for (let i = 0; i < 6; i++) {
+                    result += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                
+                return result;
+            }
+
             // Publish kuis
             document.getElementById('publish-quiz').addEventListener('click', function() {
-                const quizTitle = document.getElementById('quiz-title').value;
-                const quizDesc = document.getElementById('quiz-desc').value;
+                const quizTitle = document.getElementById('quiz-title').value.trim();
+                const quizDesc = document.getElementById('quiz-desc').value.trim();
                 const quizDeadline = document.getElementById('quiz-deadline').value;
+                const quizDuration = parseInt(document.getElementById('quiz-duration').value) || 0;
                 
                 if (!quizTitle) {
                     alert('Judul kuis harus diisi!');
@@ -650,6 +777,8 @@
                 
                 questionContainers.forEach(container => {
                     const questionText = container.querySelector('input[type="text"]').value;
+                    const points = parseInt(container.querySelector('input[type="number"]').value) || 1;
+                    
                     if (!questionText) {
                         alert('Semua pertanyaan harus diisi!');
                         hasError = true;
@@ -688,12 +817,14 @@
                             question: questionText,
                             type: "multiple",
                             options: options,
-                            correctAnswer: correctAnswerIndex
+                            correctAnswer: correctAnswerIndex,
+                            points: points
                         });
-                    } else {
-                        const answerInput = container.querySelector('.essay-answer input[type="text"]');
+                    } 
+                    else if (questionType === 'short') {
+                        const answerInput = container.querySelector('.short-answer input[type="text"]');
                         if (!answerInput.value) {
-                            alert('Jawaban untuk soal isian harus diisi!');
+                            alert('Jawaban untuk soal isian singkat harus diisi!');
                             hasError = true;
                             return;
                         }
@@ -701,33 +832,55 @@
                         questions.push({
                             id: Date.now().toString() + Math.floor(Math.random() * 1000),
                             question: questionText,
+                            type: "short",
+                            correctAnswer: answerInput.value,
+                            points: points
+                        });
+                    }
+                    else {
+                        const guidelines = container.querySelector('.essay-answer textarea').value;
+                        
+                        questions.push({
+                            id: Date.now().toString() + Math.floor(Math.random() * 1000),
+                            question: questionText,
                             type: "essay",
-                            correctAnswer: answerInput.value
+                            guidelines: guidelines,
+                            points: points
                         });
                     }
                 });
                 
                 if (hasError) return;
                 
+                const quizCode = generateQuizCode();
+                
                 const newQuiz = {
                     id: Date.now().toString(),
+                    code: quizCode,
                     title: quizTitle,
                     description: quizDesc,
                     deadline: quizDeadline,
+                    duration: quizDuration,
                     createdAt: new Date().toISOString(),
                     questions: questions
                 };
                 
                 saveQuizToStorage(newQuiz);
-                alert('Kuis berhasil dipublikasikan!');
-                renderPublishedQuizzes();
+                
+                // Tampilkan modal dengan kode kuis
+                document.getElementById('quiz-code-value').textContent = quizCode;
+                document.getElementById('quiz-code-modal').style.display = 'flex';
                 
                 // Reset form
                 document.getElementById('quiz-title').value = '';
                 document.getElementById('quiz-desc').value = '';
                 document.getElementById('quiz-deadline').value = '';
+                document.getElementById('quiz-duration').value = '0';
                 document.getElementById('questions-container').innerHTML = '';
                 questionCounter = 0;
+                
+                // Update daftar kuis
+                renderPublishedQuizzes();
             });
 
             // Batal membuat kuis
@@ -736,10 +889,31 @@
                     document.getElementById('quiz-title').value = '';
                     document.getElementById('quiz-desc').value = '';
                     document.getElementById('quiz-deadline').value = '';
+                    document.getElementById('quiz-duration').value = '0';
                     document.getElementById('questions-container').innerHTML = '';
                     questionCounter = 0;
                 }
             });
+
+            // Modal functions
+            document.getElementById('close-modal').addEventListener('click', function() {
+                document.getElementById('quiz-code-modal').style.display = 'none';
+            });
+
+            document.getElementById('copy-code').addEventListener('click', function() {
+                const code = document.getElementById('quiz-code-value').textContent;
+                navigator.clipboard.writeText(code)
+                    .then(() => alert('Kode berhasil disalin!'))
+                    .catch(() => alert('Gagal menyalin kode. Silakan salin manual.'));
+            });
+
+            document.getElementById('view-quiz').addEventListener('click', function() {
+                document.getElementById('quiz-code-modal').style.display = 'none';
+                window.location.href = 'data-kuis.html';
+            });
+
+            // Inisialisasi
+            renderPublishedQuizzes();
         });
     </script>
 </body>
