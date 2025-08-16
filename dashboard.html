@@ -16,6 +16,7 @@
             --neon-glow: 0 0 10px var(--accent);
             --error: #ff6b6b;
             --success: #2ecc71;
+            --purple: #9b59b6;
         }
         
         * {
@@ -102,7 +103,7 @@
         /* Main Content */
         .main-content {
             flex: 1;
-            margin-top: 110px; /* Adjusted for fixed navbar */
+            margin-top: 110px;
             padding: 20px 15px;
             display: flex;
             flex-direction: column;
@@ -171,6 +172,18 @@
             background: var(--success);
         }
         
+        .btn-notifikasi {
+            background: var(--error);
+        }
+        
+        .btn-credit {
+            background: var(--purple);
+        }
+        
+        .btn-credit:hover {
+            background: #8e44ad;
+        }
+        
         /* Background Elements */
         .bg-elements {
             position: fixed;
@@ -206,8 +219,10 @@
         <div class="nav-tabs">
             <a href="dashboard.html" class="nav-tab active">DASHBOARD</a>
             <a href="kuis.html" class="nav-tab">KUIS</a>
+            <a href="tugas.html" class="nav-tab">TUGAS</a>
             <a href="jadwal.html" class="nav-tab">JADWAL</a>
             <a href="notifikasi.html" class="nav-tab">INFORMARSI</a>
+            <a href="credit-murid.html" class="nav-tab">CREDITS</a>
         </div>
     </nav>
     
@@ -218,18 +233,24 @@
             <p class="welcome-message" id="welcome-message">Selamat datang di sistem pembelajaran</p>
         </div>
         
-<div class="action-buttons">
-    <a href="kuis.html" class="action-btn btn-kuis">
-        <i class="fas fa-question-circle"></i> KUIS
-    </a>
-    <a href="jadwal.html" class="action-btn btn-jadwal">
-        <i class="fas fa-calendar-alt"></i> JADWAL MAPEL
-    </a>
-    <a href="notifikasi.html" class="action-btn btn-notifikasi">
-        <i class="fas fa-bell"></i> NOTIFIKASI
-    </a>
-</div>
-</main>
+        <div class="action-buttons">
+            <a href="tugas.html" class="action-btn btn-tugas">
+                <i class="fas fa-tasks"></i> TUGAS
+            </a>
+            <a href="kuis.html" class="action-btn btn-kuis">
+                <i class="fas fa-question-circle"></i> KUIS
+            </a>
+            <a href="jadwal.html" class="action-btn btn-jadwal">
+                <i class="fas fa-calendar-alt"></i> JADWAL MAPEL
+            </a>
+            <a href="notifikasi.html" class="action-btn btn-notifikasi">
+                <i class="fas fa-bell"></i> NOTIFIKASI
+            </a>
+            <a href="credit-murid.html" class="action-btn btn-credit">
+                <i class="fas fa-user-circle"></i> CREDIT
+            </a>
+        </div>
+    </main>
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -263,6 +284,4 @@
         });
     </script>
 </body>
-
 </html>
-
