@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Credits | Murid</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap');
+        
+        :root {
+            --primary: #5dadec;
+            --accent: #00f7ff;
+            --light: #e6f7ff;
+            --dark: #1a3a6a;
+            --glass: rgba(255, 255, 255, 0.15);
+            --neon-glow: 0 0 10px var(--accent);
+            --error: #ff6b6b;
+            --success: #2ecc71;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Zen Kaku Gothic New', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0a1a2e, #1a3a6a);
+            min-height: 100vh;
+            color: var(--light);
+            touch-action: manipulation;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Navigation Bar */
+        .navbar {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 15px;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .nav-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 
+                0 0 15px var(--primary),
+                inset 0 0 5px white;
+        }
+        
+        .logo-text {
+            font-weight: 500;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            font-size: 16px;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            overflow-x: auto;
+            gap: 8px;
+            padding-bottom: 5px;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .nav-tab {
+            color: var(--light);
+            text-decoration: none;
+            font-size: 13px;
+            padding: 8px 12px;
+            border-radius: 20px;
+            transition: all 0.3s;
+            white-space: nowrap;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .nav-tab.active {
+            background: var(--primary);
+            box-shadow: var(--neon-glow);
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-top: 110px;
+            padding: 20px 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .header-section {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+        
+        .page-title {
+            font-size: 22px;
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+        
+        .profile-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary);
+            margin: 0 auto 15px;
+            box-shadow: 0 0 20px rgba(93, 173, 236, 0.5);
+        }
+        
+        .student-info {
+            margin-bottom: 20px;
+        }
+        
+        .student-name {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        .student-class {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .credits-section {
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+        
+        .credits-list {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .credit-item {
+            padding: 12px 0;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+        
+        .credit-item:last-child {
+            border-bottom: none;
+        }
+        
+        .credit-title {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        .credit-desc {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        /* Background Elements */
+        .bg-elements {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .bg-element {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--primary), transparent 70%);
+            opacity: 0.1;
+            filter: blur(30px);
+        }
+        
+        /* Responsive */
+        @media (max-width: 480px) {
+            .profile-img {
+                width: 100px;
+                height: 100px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Background Elements -->
+    <div class="bg-elements">
+        <div class="bg-element" style="width: 300px; height: 300px; top: -50px; left: -50px;"></div>
+        <div class="bg-element" style="width: 200px; height: 200px; bottom: -30px; right: -30px;"></div>
+    </div>
+    
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-header">
+            <div class="logo-icon"></div>
+            <span class="logo-text">CREDITS MURID</span>
+        </div>
+        <div class="nav-tabs">
+            <a href="dashboard.html" class="nav-tab">DASHBOARD</a>
+            <a href="kuis.html" class="nav-tab">KUIS</a>
+            <a href="tugas.html" class="nav-tab">TUGAS</a>
+            <a href="jadwal.html" class="nav-tab">JADWAL</a>
+            <a href="notifikasi.html" class="nav-tab">INFORMARSI</a>
+            <a href="credit-murid.html" class="nav-tab active">CREDITS</a>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="header-section">
+            <img src="https://files.catbox.moe/z4x47n.png" alt="Profile" class="profile-img" id="profile-pic">
+            <div class="student-info">
+                <div class="student-name" id="student-name">Nama Murid</div>
+                <div class="student-class">Kelas 8D</div>
+            </div>
+        </div>
+        
+        <div class="credits-section">
+            <h3 class="section-title">SPECIAL THANKS TO</h3>
+            <div class="credits-list">
+                <div class="credit-item">
+                    <div class="credit-title">KONDULAR</div>
+                    <div class="credit-desc">MY SUPPORT</div>
+                </div>
+                <div class="credit-item">
+                    <div class="credit-title">GITHUB</div>
+                    <div class="credit-desc">MY SUPPORT</div>
+                </div>
+                <div class="credit-item">
+                    <div class="credit-title">SHIIRO DEVELOPER</div>
+                    <div class="credit-desc">NAMA ASLINYA FATHAN</div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Dynamic font sizing
+            const baseFontSize = window.innerWidth < 400 ? 14 : 16;
+            document.documentElement.style.fontSize = baseFontSize + 'px';
+            
+            // Load student data
+            const studentName = localStorage.getItem('current_student') || 'Murid';
+            document.getElementById('student-name').textContent = studentName;
+            
+            // Load profile picture if available
+            const profilePic = localStorage.getItem('profile_pic');
+            if (profilePic) {
+                document.getElementById('profile-pic').src = profilePic;
+            }
+            
+            // Touch feedback for tabs
+            const tabs = document.querySelectorAll('.nav-tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('touchstart', function() {
+                    this.style.transform = 'scale(0.95)';
+                });
+                tab.addEventListener('touchend', function() {
+                    this.style.transform = '';
+                });
+            });
+            
+            // Prevent zooming
+            document.addEventListener('gesturestart', function(e) {
+                e.preventDefault();
+            });
+        });
+    </script>
+</body>
+</html>

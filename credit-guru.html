@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Credits | Guru</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap');
+        
+        :root {
+            --primary: #5dadec;
+            --accent: #00f7ff;
+            --light: #e6f7ff;
+            --dark: #1a3a6a;
+            --glass: rgba(255, 255, 255, 0.15);
+            --neon-glow: 0 0 10px var(--accent);
+            --error: #ff6b6b;
+            --success: #2ecc71;
+            --warning: #f39c12;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Zen Kaku Gothic New', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0a1a2e, #1a3a6a);
+            min-height: 100vh;
+            color: var(--light);
+            perspective: 1000px;
+            touch-action: manipulation;
+        }
+        
+        .navbar {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 15px;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 
+                0 0 15px var(--primary),
+                inset 0 0 5px white;
+        }
+        
+        .logo-text {
+            font-weight: 500;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            font-size: 16px;
+        }
+        
+        .nav-links {
+            display: flex;
+            overflow-x: auto;
+            gap: 8px;
+            padding-bottom: 5px;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .nav-link {
+            color: var(--light);
+            text-decoration: none;
+            font-size: 13px;
+            padding: 8px 12px;
+            border-radius: 20px;
+            transition: all 0.3s;
+            white-space: nowrap;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .nav-link.active {
+            background: var(--primary);
+            box-shadow: var(--neon-glow);
+        }
+        
+        .container {
+            margin-top: 100px;
+            padding: 15px;
+            padding-bottom: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .header-section {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        h1 {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+        
+        .credits-list {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        .credit-item {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .credit-item:hover {
+            border-color: var(--primary);
+            box-shadow: 0 5px 15px rgba(93, 173, 236, 0.2);
+        }
+        
+        .profile-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary);
+            margin-bottom: 15px;
+            box-shadow: 0 0 15px rgba(93, 173, 236, 0.5);
+        }
+        
+        .credit-title {
+            font-weight: 500;
+            margin-bottom: 10px;
+            color: var(--accent);
+            font-size: 18px;
+        }
+        
+        .credit-name {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        
+        .credit-role {
+            font-size: 14px;
+            opacity: 0.8;
+            font-style: italic;
+        }
+        
+        .bg-elements {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .bg-element {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--primary), transparent 70%);
+            opacity: 0.1;
+            filter: blur(30px);
+        }
+
+        /* Responsif */
+        @media (max-width: 480px) {
+            .container {
+                margin-top: 90px;
+                padding: 12px;
+            }
+            
+            .header-section {
+                padding: 12px;
+            }
+            
+            .credit-item {
+                padding: 15px;
+            }
+            
+            .profile-img {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .credit-title {
+                font-size: 16px;
+            }
+            
+            .credit-name {
+                font-size: 14px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Background Elements -->
+    <div class="bg-elements">
+        <div class="bg-element" style="width: 300px; height: 300px; top: -50px; left: -50px;"></div>
+        <div class="bg-element" style="width: 200px; height: 200px; bottom: -30px; right: -30px;"></div>
+    </div>
+    
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="logo">
+            <div class="logo-icon"></div>
+            <span class="logo-text">GURU KELAS 8D</span>
+        </div>
+        <div class="nav-links">
+            <a href="manajemen.html" class="nav-link">MANAJEMEN</a>
+            <a href="create-kuis.html" class="nav-link">BUAT KUIS</a>
+            <a href="pengumuman.html" class="nav-link">PENGUMUMAN</a>
+            <a href="data-kuis.html" class="nav-link">DATA KUIS</a>
+            <a href="credit.html" class="nav-link active">CREDITS</a>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <div class="container">
+        <section class="header-section">
+            <h1>SPECIAL THANKS TO</h1>
+            <p>Terima kasih kepada semua yang telah mendukung</p>
+        </section>
+        
+        <div class="credits-list">
+            <div class="credit-item">
+                <img src="https://files.catbox.moe/uksoyo.jpg" alt="Kondular" class="profile-img">
+                <div class="credit-title">SUPPORT SYSTEM</div>
+                <div class="credit-name">KONDULAR</div>
+                <div class="credit-role">MY SUPPORT</div>
+            </div>
+            
+            <div class="credit-item">
+                <img src="https://files.catbox.moe/aaxty2.jpg" alt="GitHub" class="profile-img">
+                <div class="credit-title">DEVELOPMENT</div>
+                <div class="credit-name">GITHUB</div>
+                <div class="credit-role">MY SUPPORT</div>
+            </div>
+            
+            <div class="credit-item">
+                <img src="https://files.catbox.moe/z4x47n.png" alt="Fathan/Shiiro" class="profile-img">
+                <div class="credit-title">DEVELOPER</div>
+                <div class="credit-name">FATHAN</div>
+                <div class="credit-role">ITS ME</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ukuran font dinamis
+            const baseFontSize = window.innerWidth < 400 ? 14 : 16;
+            document.documentElement.style.fontSize = baseFontSize + 'px';
+            
+            // Touch feedback untuk tombol
+            const buttons = document.querySelectorAll('.btn, .nav-link');
+            buttons.forEach(btn => {
+                btn.addEventListener('touchstart', function() {
+                    this.style.transform = 'scale(0.95)';
+                });
+                btn.addEventListener('touchend', function() {
+                    this.style.transform = '';
+                });
+            });
+            
+            // Mencegah zoom
+            document.addEventListener('gesturestart', function(e) {
+                e.preventDefault();
+            });
+        });
+    </script>
+</body>
+</html>
