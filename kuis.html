@@ -549,7 +549,20 @@
                 if (!results[quizId]) {
                     results[quizId] = [];
                 }
-                results[quizId].push(result);
+                
+                // Cek apakah siswa sudah pernah mengumpulkan kuis ini
+                const existingSubmissionIndex = results[quizId].findIndex(
+                    sub => sub.studentId === currentUser.id
+                );
+                
+                if (existingSubmissionIndex !== -1) {
+                    // Update submission yang sudah ada
+                    results[quizId][existingSubmissionIndex] = result;
+                } else {
+                    // Tambahkan submission baru
+                    results[quizId].push(result);
+                }
+                
                 localStorage.setItem('quiz_results', JSON.stringify(results));
             }
 
@@ -724,6 +737,7 @@
                 let wrongCount = 0;
                 let totalScore = 0;
                 let maxScore = 0;
+                const studentAnswers = [];
                 
                 // Periksa setiap jawaban
                 document.querySelectorAll('.question-container').forEach(questionDiv => {
@@ -733,10 +747,15 @@
                     
                     maxScore += questionData.points || 1;
                     
+                    let studentAnswer = null;
+                    let isCorrect = false;
+                    
                     if (questionType === 'multiple') {
                         const selectedOption = questionDiv.querySelector('.option-item.selected');
                         if (selectedOption) {
-                            const isCorrect = selectedOption.querySelector('input').dataset.correct === 'true';
+                            studentAnswer = parseInt(selectedOption.dataset.optionIndex);
+                            isCorrect = selectedOption.querySelector('input').dataset.correct === 'true';
+                            
                             if (isCorrect) {
                                 correctCount++;
                                 totalScore += questionData.points || 1;
@@ -748,10 +767,11 @@
                         }
                     } else if (questionType === 'short') {
                         const answerInput = questionDiv.querySelector('.short-answer-input');
-                        const userAnswer = answerInput.value.trim().toLowerCase();
+                        studentAnswer = answerInput.value.trim();
                         const correctAnswer = answerInput.dataset.correctAnswer.toLowerCase();
                         
-                        if (userAnswer === correctAnswer) {
+                        if (studentAnswer.toLowerCase() === correctAnswer) {
+                            isCorrect = true;
                             correctCount++;
                             totalScore += questionData.points || 1;
                         } else {
@@ -759,9 +779,19 @@
                         }
                     } else {
                         // Essay tidak dinilai otomatis
+                        const answerInput = questionDiv.querySelector('.essay-answer-input');
+                        studentAnswer = answerInput.value.trim();
+                        isCorrect = true; // Default true untuk essay (perlu penilaian manual)
                         correctCount++;
                         totalScore += questionData.points || 1;
                     }
+                    
+                    // Simpan jawaban siswa
+                    studentAnswers.push({
+                        questionId: questionId,
+                        answer: studentAnswer,
+                        isCorrect: isCorrect
+                    });
                 });
                 
                 // Hitung persentase
@@ -773,14 +803,18 @@
                 
                 // Simpan hasil ke localStorage
                 const result = {
+                    quizId: quiz.id,
+                    quizTitle: quiz.title,
                     studentId: currentUser.id,
                     studentName: currentUser.name,
                     timestamp: new Date().toISOString(),
+                    answers: studentAnswers,
                     correct: correctCount,
                     wrong: wrongCount,
                     score: totalScore,
                     total: maxScore,
-                    status: status
+                    status: status,
+                    percentage: percentage
                 };
                 
                 saveQuizResult(quiz.id, result);
@@ -845,4 +879,3 @@
     </script>
 </body>
 </html>
-
