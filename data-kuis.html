@@ -17,6 +17,9 @@
             --error: #ff6b6b;
             --success: #2ecc71;
             --warning: #f39c12;
+            --gold: #ffd700;
+            --silver: #c0c0c0;
+            --bronze: #cd7f32;
         }
         
         * {
@@ -271,6 +274,89 @@
             filter: blur(30px);
         }
 
+        /* Badge Juara */
+        .rank-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        .rank-1 {
+            background: var(--gold);
+            color: #000;
+        }
+
+        .rank-2 {
+            background: var(--silver);
+            color: #000;
+        }
+
+        .rank-3 {
+            background: var(--bronze);
+            color: #fff;
+        }
+
+        /* Leaderboard */
+        .leaderboard {
+            background: var(--glass);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .leaderboard-title {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            background: rgba(0,0,0,0.2);
+        }
+
+        .leaderboard-rank {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .leaderboard-details {
+            flex: 1;
+        }
+
+        .leaderboard-name {
+            font-weight: 500;
+        }
+
+        .leaderboard-score {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
         /* Perbaikan tata letak untuk mobile */
         @media (max-width: 480px) {
             .container {
@@ -355,6 +441,14 @@
             </div>
         </div>
         
+        <!-- Leaderboard Section -->
+        <div id="leaderboard-container" class="leaderboard hidden">
+            <h3 class="leaderboard-title"><i class="fas fa-trophy"></i> Peringkat Teratas</h3>
+            <div id="top-students">
+                <!-- Leaderboard items will be inserted here -->
+            </div>
+        </div>
+        
         <div class="quiz-list" id="submissions-container">
             <!-- Data hasil kuis akan dimuat di sini -->
             <div class="empty-state">
@@ -386,39 +480,107 @@
                 e.preventDefault();
             });
 
-            // Ambil data kuis dari localStorage
-            function getQuizSubmissions() {
-                return JSON.parse(localStorage.getItem('quiz_submissions')) || [];
+            // Ambil data hasil kuis dari localStorage
+            function getQuizResults() {
+                return JSON.parse(localStorage.getItem('quiz_results')) || {};
             }
 
             // Ambil data kuis guru dari localStorage
             function getTeacherQuizzes() {
-                return JSON.parse(localStorage.getItem('teacher_quizzes')) || {};
+                return JSON.parse(localStorage.getItem('teacher_quizzes')) || [];
             }
 
             // Hapus submission tertentu
-            function deleteSubmission(submissionId) {
-                let submissions = getQuizSubmissions();
-                submissions = submissions.filter(sub => sub.submittedAt !== submissionId);
-                localStorage.setItem('quiz_submissions', JSON.stringify(submissions));
-                renderSubmissions();
+            function deleteSubmission(quizId, submissionId) {
+                const results = getQuizResults();
+                if (results[quizId]) {
+                    results[quizId] = results[quizId].filter(sub => sub.timestamp !== submissionId);
+                    localStorage.setItem('quiz_results', JSON.stringify(results));
+                    renderSubmissions();
+                }
             }
 
             // Hapus semua data
             function clearAllSubmissions() {
                 if (confirm('Apakah Anda yakin ingin menghapus semua data hasil kuis? Aksi ini tidak dapat dibatalkan.')) {
-                    localStorage.removeItem('quiz_submissions');
+                    localStorage.removeItem('quiz_results');
                     renderSubmissions();
                 }
             }
 
+            // Fungsi untuk menentukan peringkat
+            function determineRankings(submissions) {
+                // Flatten semua hasil kuis dari semua kuis
+                let allResults = [];
+                Object.values(submissions).forEach(quizResults => {
+                    allResults = allResults.concat(quizResults);
+                });
+
+                // Urutkan berdasarkan skor (descending)
+                allResults.sort((a, b) => {
+                    const scoreA = (a.score / a.total) * 100;
+                    const scoreB = (b.score / b.total) * 100;
+                    return scoreB - scoreA;
+                });
+
+                // Tambahkan peringkat
+                allResults.forEach((result, index) => {
+                    result.rank = index + 1;
+                });
+
+                return allResults;
+            }
+
+            // Render leaderboard
+            function renderLeaderboard(submissions) {
+                const leaderboardContainer = document.getElementById('leaderboard-container');
+                const topStudentsContainer = document.getElementById('top-students');
+                
+                const allResults = determineRankings(submissions);
+                
+                if (allResults.length === 0) {
+                    leaderboardContainer.classList.add('hidden');
+                    return;
+                }
+                
+                leaderboardContainer.classList.remove('hidden');
+                
+                // Ambil top 5 siswa
+                const topStudents = allResults.slice(0, 5);
+                
+                topStudentsContainer.innerHTML = topStudents.map((student, index) => {
+                    const percentage = Math.round((student.score / student.total) * 100);
+                    let rankClass = '';
+                    
+                    if (index === 0) rankClass = 'rank-1';
+                    else if (index === 1) rankClass = 'rank-2';
+                    else if (index === 2) rankClass = 'rank-3';
+                    
+                    return `
+                        <div class="leaderboard-item">
+                            <div class="leaderboard-rank ${rankClass}">${index + 1}</div>
+                            <div class="leaderboard-details">
+                                <div class="leaderboard-name">${student.studentName}</div>
+                                <div class="leaderboard-score">
+                                    Skor: ${student.score}/${student.total} (${percentage}%) | 
+                                    ${student.correct} Benar | ${student.wrong} Salah
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
             // Render data submissions
             function renderSubmissions(filter = '') {
-                const submissions = getQuizSubmissions();
+                const results = getQuizResults();
                 const quizzes = getTeacherQuizzes();
                 const container = document.getElementById('submissions-container');
                 
-                if (submissions.length === 0) {
+                // Render leaderboard terlebih dahulu
+                renderLeaderboard(results);
+                
+                if (Object.keys(results).length === 0) {
                     container.innerHTML = `
                         <div class="empty-state">
                             <i class="fas fa-inbox" style="font-size: 40px; margin-bottom: 10px;"></i>
@@ -429,118 +591,150 @@
                 }
                 
                 // Kelompokkan submission berdasarkan quizId
-                const groupedSubmissions = {};
+                let submissionsHtml = '';
                 
-                submissions.forEach(submission => {
-                    if (!groupedSubmissions[submission.quizId]) {
-                        groupedSubmissions[submission.quizId] = {
-                            quizTitle: submission.quizTitle,
-                            submissions: []
-                        };
-                    }
-                    groupedSubmissions[submission.quizId].submissions.push(submission);
-                });
+                // Loop melalui setiap kuis yang memiliki hasil
+                for (const [quizId, quizResults] of Object.entries(results)) {
+                    // Temukan data kuis asli
+                    const quiz = quizzes.find(q => q.id === quizId);
+                    if (!quiz) continue;
+                    
+                    // Filter berdasarkan pencarian
+                    const filteredResults = quizResults.filter(result => {
+                        if (!filter) return true;
+                        const searchTerm = filter.toLowerCase();
+                        return (
+                            quiz.title.toLowerCase().includes(searchTerm) ||
+                            result.studentName.toLowerCase().includes(searchTerm)
+                        );
+                    });
+                    
+                    if (filteredResults.length === 0) continue;
+                    
+                    // Urutkan hasil berdasarkan skor (descending)
+                    filteredResults.sort((a, b) => {
+                        const scoreA = (a.score / a.total) * 100;
+                        const scoreB = (b.score / b.total) * 100;
+                        return scoreB - scoreA;
+                    });
+                    
+                    // Tambahkan badge juara untuk 3 teratas
+                    filteredResults.forEach((result, index) => {
+                        result.rank = index + 1;
+                    });
+                    
+                    // Buat HTML untuk kuis ini
+                    submissionsHtml += `
+                        <div class="quiz-card">
+                            <div class="quiz-title">${quiz.title}</div>
+                            <div class="quiz-meta">
+                                <span><i class="fas fa-users"></i> ${filteredResults.length} Murid</span>
+                                <span><i class="fas fa-question-circle"></i> ${quiz.questions.length} Pertanyaan</span>
+                            </div>
+                            
+                            <div class="submission-info">
+                                ${filteredResults.map(result => {
+                                    const percentage = Math.round((result.score / result.total) * 100);
+                                    let rankBadge = '';
+                                    
+                                    if (result.rank === 1) rankBadge = '<div class="rank-badge rank-1">🥇</div>';
+                                    else if (result.rank === 2) rankBadge = '<div class="rank-badge rank-2">🥈</div>';
+                                    else if (result.rank === 3) rankBadge = '<div class="rank-badge rank-3">🥉</div>';
+                                    
+                                    return `
+                                        <div class="submission-item">
+                                            ${rankBadge}
+                                            <div class="submission-details">
+                                                <div><strong>${result.studentName}</strong></div>
+                                                <div>
+                                                    Skor: <span class="score">${result.score}/${result.total}</span>
+                                                    (${percentage}%) | 
+                                                    <span class="correct">${result.correct} Benar</span> | 
+                                                    <span class="incorrect">${result.wrong} Salah</span>
+                                                </div>
+                                                <div>
+                                                    Dikumpulkan: ${new Date(result.timestamp).toLocaleString()}
+                                                </div>
+                                            </div>
+                                            <div class="submission-actions">
+                                                <button class="btn btn-primary view-details" 
+                                                    data-quiz-id="${quizId}"
+                                                    data-submission-id="${result.timestamp}">
+                                                    <i class="fas fa-eye"></i> Detail
+                                                </button>
+                                                <button class="btn btn-danger delete-submission" 
+                                                    data-quiz-id="${quizId}"
+                                                    data-submission-id="${result.timestamp}">
+                                                    <i class="fas fa-trash"></i> Hapus
+                                                </button>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
                 
-                // Filter data berdasarkan input pencarian
-                const filteredGroups = Object.entries(groupedSubmissions).filter(([quizId, group]) => {
-                    if (!filter) return true;
-                    const searchTerm = filter.toLowerCase();
-                    return (
-                        group.quizTitle.toLowerCase().includes(searchTerm) ||
-                        group.submissions.some(sub => 
-                            sub.studentName.toLowerCase().includes(searchTerm)
-                    );
-                });
-                
-                if (filteredGroups.length === 0) {
+                if (submissionsHtml === '') {
                     container.innerHTML = `
                         <div class="no-results">
                             <i class="fas fa-search" style="font-size: 30px; margin-bottom: 10px;"></i>
                             <p>Tidak ditemukan hasil yang sesuai dengan pencarian</p>
                         </div>
                     `;
-                    return;
+                } else {
+                    container.innerHTML = submissionsHtml;
                 }
-                
-                // Render data yang sudah difilter
-                container.innerHTML = filteredGroups.map(([quizId, group]) => {
-                    // Dapatkan data kuis asli untuk pertanyaan
-                    const quiz = quizzes[quizId] || { questions: [] };
-                    
-                    return `
-                        <div class="quiz-card">
-                            <div class="quiz-title">${group.quizTitle}</div>
-                            <div class="quiz-meta">
-                                <span>${group.submissions.length} Pengumpulan</span>
-                                <span>${quiz.questions.length} Pertanyaan</span>
-                            </div>
-                            
-                            <div class="submission-info">
-                                ${group.submissions.map(submission => `
-                                    <div class="submission-item">
-                                        <div class="submission-details">
-                                            <div><strong>${submission.studentName}</strong></div>
-                                            <div>
-                                                Skor: <span class="score">${submission.score}/${submission.totalQuestions}</span>
-                                                (${Math.round((submission.score / submission.totalQuestions) * 100)}%)
-                                            </div>
-                                            <div>
-                                                Dikumpulkan: ${new Date(submission.submittedAt).toLocaleString()}
-                                            </div>
-                                        </div>
-                                        <div class="submission-actions">
-                                            <button class="btn btn-primary view-details" data-submission-id="${submission.submittedAt}">
-                                                <i class="fas fa-eye"></i> Detail
-                                            </button>
-                                            <button class="btn btn-danger delete-submission" data-submission-id="${submission.submittedAt}">
-                                                <i class="fas fa-trash"></i> Hapus
-                                            </button>
-                                        </div>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    `;
-                }).join('');
                 
                 // Tambahkan event listener untuk tombol detail
                 document.querySelectorAll('.view-details').forEach(btn => {
                     btn.addEventListener('click', function() {
+                        const quizId = this.getAttribute('data-quiz-id');
                         const submissionId = this.getAttribute('data-submission-id');
-                        showSubmissionDetails(submissionId);
+                        showSubmissionDetails(quizId, submissionId);
                     });
                 });
                 
                 // Tambahkan event listener untuk tombol hapus
                 document.querySelectorAll('.delete-submission').forEach(btn => {
                     btn.addEventListener('click', function() {
+                        const quizId = this.getAttribute('data-quiz-id');
                         const submissionId = this.getAttribute('data-submission-id');
                         if (confirm('Apakah Anda yakin ingin menghapus data pengumpulan ini?')) {
-                            deleteSubmission(submissionId);
+                            deleteSubmission(quizId, submissionId);
                         }
                     });
                 });
             }
 
             // Tampilkan detail submission
-            function showSubmissionDetails(submissionId) {
-                const submissions = getQuizSubmissions();
+            function showSubmissionDetails(quizId, submissionId) {
+                const results = getQuizResults();
                 const quizzes = getTeacherQuizzes();
-                const submission = submissions.find(sub => sub.submittedAt === submissionId);
                 
+                const quizResults = results[quizId];
+                if (!quizResults) {
+                    alert('Data kuis tidak ditemukan!');
+                    return;
+                }
+                
+                const submission = quizResults.find(sub => sub.timestamp === submissionId);
                 if (!submission) {
                     alert('Data pengumpulan tidak ditemukan!');
                     return;
                 }
                 
-                const quiz = quizzes[submission.quizId] || { questions: [] };
+                const quiz = quizzes.find(q => q.id === quizId) || { questions: [] };
                 
                 let detailsHtml = `
                     <div style="background: var(--glass); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-                        <h3 style="margin-bottom: 10px;">${submission.quizTitle}</h3>
+                        <h3 style="margin-bottom: 10px;">${quiz.title}</h3>
                         <p><strong>Murid:</strong> ${submission.studentName}</p>
-                        <p><strong>Skor:</strong> ${submission.score}/${submission.totalQuestions} (${Math.round((submission.score / submission.totalQuestions) * 100)}%)</p>
-                        <p><strong>Dikumpulkan:</strong> ${new Date(submission.submittedAt).toLocaleString()}</p>
+                        <p><strong>Skor:</strong> ${submission.score}/${submission.total} (${Math.round((submission.score / submission.total) * 100)}%)</p>
+                        <p><strong>Benar:</strong> <span class="correct">${submission.correct}</span> | <strong>Salah:</strong> <span class="incorrect">${submission.wrong}</span></p>
+                        <p><strong>Status:</strong> ${submission.status}</p>
+                        <p><strong>Dikumpulkan:</strong> ${new Date(submission.timestamp).toLocaleString()}</p>
                     </div>
                     
                     <div style="margin-top: 20px;">
@@ -548,27 +742,19 @@
                 `;
                 
                 quiz.questions.forEach((question, index) => {
-                    const studentAnswer = submission.answers[index];
+                    // Untuk pertanyaan pilihan ganda, kita perlu tahu jawaban siswa
+                    // Karena data asli tidak menyimpan jawaban siswa, kita akan menampilkan benar/salah saja
+                    
                     let answerHtml = '';
-                    let isCorrect = false;
                     
                     if (question.type === 'multiple') {
-                        isCorrect = parseInt(studentAnswer) === question.correctAnswer;
-                        const selectedOption = question.options[studentAnswer] || 'Tidak dijawab';
-                        const correctOption = question.options[question.correctAnswer];
-                        
                         answerHtml = `
-                            <p>Jawaban murid: <span class="${isCorrect ? 'correct' : 'incorrect'}">${selectedOption}</span></p>
-                            ${!isCorrect ? `<p>Jawaban benar: <span class="correct">${correctOption}</span></p>` : ''}
+                            <p>Jawaban benar: <span class="correct">${question.options[question.correctAnswer]}</span></p>
                         `;
                     } else {
                         answerHtml = `
-                            <p>Jawaban murid:</p>
-                            <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 6px; margin: 5px 0;">
-                                ${studentAnswer || 'Tidak dijawab'}
-                            </div>
                             <p>Jawaban yang diharapkan: ${question.correctAnswer}</p>
-                            <p><em>(Soal isian memerlukan penilaian manual)</em></p>
+                            <p><em>(Soal isian/essay memerlukan penilaian manual)</em></p>
                         `;
                     }
                     
