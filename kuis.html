@@ -392,6 +392,21 @@
             padding: 15px;
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
+
+        /* Tambahan untuk menampilkan nama siswa */
+        .student-info {
+            position: fixed;
+            top: 100px;
+            left: 15px;
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-radius: 8px;
+            padding: 8px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-weight: 500;
+            color: var(--accent);
+            z-index: 10;
+        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
@@ -416,6 +431,11 @@
             <a href="credit-murid.html" class="nav-link"> CREDITS</a>
         </div>
     </nav>
+    
+    <!-- Info Siswa -->
+    <div class="student-info hidden" id="student-info">
+        <i class="fas fa-user"></i> <span id="student-name-display">-</span>
+    </div>
     
     <!-- Main Content -->
     <div class="container">
@@ -527,10 +547,22 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Simpan data user (simulasi)
-            const currentUser = JSON.parse(localStorage.getItem('currentUser')) || {
+            // Ambil data siswa dari localStorage (sesuai login-murid.html)
+            const currentStudent = localStorage.getItem('current_student');
+            
+            // Tampilkan nama siswa di pojok kiri atas
+            const studentInfoElement = document.getElementById('student-info');
+            const studentNameDisplay = document.getElementById('student-name-display');
+            
+            if (currentStudent) {
+                studentNameDisplay.textContent = currentStudent;
+                studentInfoElement.classList.remove('hidden');
+            }
+            
+            // Simpan data user (disesuaikan dengan login-murid.html)
+            const currentUser = {
                 id: 's' + Math.floor(Math.random() * 1000),
-                name: 'Siswa Anonim'
+                name: currentStudent || 'Siswa Anonim'
             };
             
             // Ambil kuis dari localStorage
