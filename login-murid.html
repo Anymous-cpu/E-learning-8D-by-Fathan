@@ -172,10 +172,16 @@
                     return;
                 }
                 
-                // Save student name to localStorage
-                localStorage.setItem('current_student', studentName + ' (8D)');
+                // Save student data to localStorage as object
+                const studentData = {
+                    id: 's' + Math.floor(Math.random() * 1000),
+                    name: studentName,
+                    class: '8D',
+                    loginTime: new Date().toISOString()
+                };
+                localStorage.setItem('currentUser', JSON.stringify(studentData));
                 
-                // Redirect to dashboard (lowercase filename for GitHub Pages)
+                // Redirect to dashboard
                 window.location.href = "dashboard.html";
             });
             
@@ -199,4 +205,3 @@
     </script>
 </body>
 </html>
-
