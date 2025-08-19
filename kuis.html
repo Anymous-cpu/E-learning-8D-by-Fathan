@@ -393,19 +393,12 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        /* Tambahan untuk menampilkan nama siswa */
-        .student-info {
-            position: fixed;
-            top: 100px;
-            left: 15px;
-            background: var(--glass);
-            backdrop-filter: blur(12px);
-            border-radius: 8px;
-            padding: 8px 12px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            font-weight: 500;
-            color: var(--accent);
-            z-index: 10;
+        /* Error message */
+        .error-message {
+            color: var(--error);
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -432,11 +425,6 @@
         </div>
     </nav>
     
-    <!-- Info Siswa -->
-    <div class="student-info hidden" id="student-info">
-        <i class="fas fa-user"></i> <span id="student-name-display">-</span>
-    </div>
-    
     <!-- Main Content -->
     <div class="container">
         <!-- Modal Join Kuis -->
@@ -449,6 +437,7 @@
                 <div class="form-control">
                     <label for="quiz-code">Masukkan Kode Kuis</label>
                     <input type="text" id="quiz-code" placeholder="Misal: KUIS-ABCDEF">
+                    <div class="error-message" id="code-error"></div>
                 </div>
                 <div style="margin-top: 20px;">
                     <button class="btn btn-accent" id="join-quiz">
@@ -547,22 +536,10 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Ambil data siswa dari localStorage (sesuai login-murid.html)
-            const currentStudent = localStorage.getItem('current_student');
-            
-            // Tampilkan nama siswa di pojok kiri atas
-            const studentInfoElement = document.getElementById('student-info');
-            const studentNameDisplay = document.getElementById('student-name-display');
-            
-            if (currentStudent) {
-                studentNameDisplay.textContent = currentStudent;
-                studentInfoElement.classList.remove('hidden');
-            }
-            
             // Simpan data user (disesuaikan dengan login-murid.html)
             const currentUser = {
                 id: 's' + Math.floor(Math.random() * 1000),
-                name: currentStudent || 'Siswa Anonim'
+                name: 'Murid 8D'
             };
             
             // Ambil kuis dari localStorage
@@ -619,7 +596,7 @@
                     <div class="quiz-card" data-quiz-id="${quiz.id}">
                         <div class="quiz-title">${quiz.title}</div>
                         <div class="quiz-meta">
-                            <span><i class="fas fa-clock"></i> Batas: ${new Date(quiz.deadline).toLocaleString()}</span>
+                            <span><i class="fas fa-clock"></i> ${new Date(quiz.deadline).toLocaleString()}</span>
                             <span><i class="fas fa-question-circle"></i> ${quiz.questions.length} Pertanyaan</span>
                         </div>
                         <button class="btn btn-accent" style="width: 100%; margin-top: 10px;" data-quiz-code="${quiz.code}">
@@ -642,7 +619,16 @@
                 const quiz = quizzes.find(q => q.code === quizCode);
                 
                 if (!quiz) {
-                    alert('Kuis tidak ditemukan!');
+                    showError('Kuis tidak ditemukan!', 'code-error');
+                    return;
+                }
+                
+                // Periksa apakah deadline sudah lewat
+                const now = new Date();
+                const deadline = new Date(quiz.deadline);
+                
+                if (deadline < now) {
+                    showError('Batas waktu kuis sudah lewat!', 'code-error');
                     return;
                 }
                 
@@ -697,7 +683,7 @@
                     else if (question.type === 'short') {
                         questionContent = `
                             <div class="question-text">${index + 1}. ${question.question}</div>
-                            <input type="text" class="short-answer-input" placeholder="Masukkan jawaban singkat" data-correct-answer="${question.correctAnswer}">
+                            <input type="text" class="short-answer-input" placeholder="Masukkan jawaban singkat" data-correct-answer="${question.correctAnswer.toLowerCase()}">
                         `;
                     }
                     else {
@@ -777,6 +763,8 @@
                     const questionType = questionDiv.dataset.questionType;
                     const questionData = questions.find(q => q.id === questionId);
                     
+                    if (!questionData) return;
+                    
                     maxScore += questionData.points || 1;
                     
                     let studentAnswer = null;
@@ -799,10 +787,10 @@
                         }
                     } else if (questionType === 'short') {
                         const answerInput = questionDiv.querySelector('.short-answer-input');
-                        studentAnswer = answerInput.value.trim();
-                        const correctAnswer = answerInput.dataset.correctAnswer.toLowerCase();
+                        studentAnswer = answerInput.value.trim().toLowerCase();
+                        const correctAnswer = answerInput.dataset.correctAnswer;
                         
-                        if (studentAnswer.toLowerCase() === correctAnswer) {
+                        if (studentAnswer === correctAnswer) {
                             isCorrect = true;
                             correctCount++;
                             totalScore += questionData.points || 1;
@@ -878,6 +866,17 @@
                 document.getElementById('quiz-result-modal').style.display = 'flex';
             }
 
+            // Tampilkan error
+            function showError(message, elementId) {
+                const errorElement = document.getElementById(elementId);
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+                
+                setTimeout(() => {
+                    errorElement.style.display = 'none';
+                }, 3000);
+            }
+
             // Event listeners
             document.getElementById('show-join-modal').addEventListener('click', function() {
                 document.getElementById('join-quiz-modal').style.display = 'flex';
@@ -890,14 +889,26 @@
             document.getElementById('join-quiz').addEventListener('click', function() {
                 const quizCode = document.getElementById('quiz-code').value.trim();
                 if (!quizCode) {
-                    alert('Masukkan kode kuis terlebih dahulu!');
+                    showError('Masukkan kode kuis terlebih dahulu!', 'code-error');
                     return;
                 }
                 
                 startQuiz(quizCode);
             });
             
-            document.getElementById('submit-quiz').addEventListener('click', submitQuiz);
+            document.getElementById('submit-quiz').addEventListener('click', function() {
+                // Validasi apakah semua pertanyaan telah dijawab
+                const unansweredQuestions = document.querySelectorAll('.question-container').length - 
+                    document.querySelectorAll('.option-item.selected, .short-answer-input:not(:empty), .essay-answer-input:not(:empty)').length;
+                
+                if (unansweredQuestions > 0) {
+                    if (!confirm(`Anda belum menjawab ${unansweredQuestions} pertanyaan. Yakin ingin mengirim?`)) {
+                        return;
+                    }
+                }
+                
+                submitQuiz();
+            });
             
             document.getElementById('close-result-modal').addEventListener('click', function() {
                 document.getElementById('quiz-result-modal').style.display = 'none';
