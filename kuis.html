@@ -393,12 +393,40 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        /* Error message */
-        .error-message {
-            color: var(--error);
-            font-size: 12px;
-            margin-top: 5px;
-            display: none;
+        /* Tambahan untuk menampilkan nama siswa */
+        .student-info {
+            position: fixed;
+            top: 100px;
+            left: 15px;
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-radius: 8px;
+            padding: 8px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-weight: 500;
+            color: var(--accent);
+            z-index: 10;
+        }
+
+        /* Form input nama dan absen */
+        .form-control {
+            margin-bottom: 15px;
+        }
+        
+        .form-control label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .form-control input {
+            width: 100%;
+            padding: 10px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            color: white;
+            font-size: 14px;
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -425,6 +453,11 @@
         </div>
     </nav>
     
+    <!-- Info Siswa -->
+    <div class="student-info hidden" id="student-info">
+        <i class="fas fa-user"></i> <span id="student-name-display">-</span>
+    </div>
+    
     <!-- Main Content -->
     <div class="container">
         <!-- Modal Join Kuis -->
@@ -437,7 +470,14 @@
                 <div class="form-control">
                     <label for="quiz-code">Masukkan Kode Kuis</label>
                     <input type="text" id="quiz-code" placeholder="Misal: KUIS-ABCDEF">
-                    <div class="error-message" id="code-error"></div>
+                </div>
+                <div class="form-control">
+                    <label for="student-name">Nama Lengkap</label>
+                    <input type="text" id="student-name" placeholder="Masukkan nama lengkap">
+                </div>
+                <div class="form-control">
+                    <label for="student-number">Nomor Absen</label>
+                    <input type="number" id="student-number" placeholder="Masukkan nomor absen" min="1">
                 </div>
                 <div style="margin-top: 20px;">
                     <button class="btn btn-accent" id="join-quiz">
@@ -461,6 +501,14 @@
                     <div class="result-detail">
                         <span>Nama Kuis:</span>
                         <span id="result-quiz-title">-</span>
+                    </div>
+                    <div class="result-detail">
+                        <span>Nama Murid:</span>
+                        <span id="result-student-name">-</span>
+                    </div>
+                    <div class="result-detail">
+                        <span>Nomor Absen:</span>
+                        <span id="result-student-number">-</span>
                     </div>
                     <div class="result-detail correct-answer">
                         <span>Jawaban Benar:</span>
@@ -539,7 +587,8 @@
             // Simpan data user (disesuaikan dengan login-murid.html)
             const currentUser = {
                 id: 's' + Math.floor(Math.random() * 1000),
-                name: 'Murid 8D'
+                name: '',
+                number: ''
             };
             
             // Ambil kuis dari localStorage
@@ -596,7 +645,7 @@
                     <div class="quiz-card" data-quiz-id="${quiz.id}">
                         <div class="quiz-title">${quiz.title}</div>
                         <div class="quiz-meta">
-                            <span><i class="fas fa-clock"></i> ${new Date(quiz.deadline).toLocaleString()}</span>
+                            <span><i class="fas fa-clock"></i> Batas: ${new Date(quiz.deadline).toLocaleString()}</span>
                             <span><i class="fas fa-question-circle"></i> ${quiz.questions.length} Pertanyaan</span>
                         </div>
                         <button class="btn btn-accent" style="width: 100%; margin-top: 10px;" data-quiz-code="${quiz.code}">
@@ -608,7 +657,8 @@
                 // Tambah event listener untuk tombol ikuti kuis
                 document.querySelectorAll('[data-quiz-code]').forEach(btn => {
                     btn.addEventListener('click', function() {
-                        startQuiz(this.getAttribute('data-quiz-code'));
+                        document.getElementById('join-quiz-modal').style.display = 'flex';
+                        document.getElementById('quiz-code').value = this.getAttribute('data-quiz-code');
                     });
                 });
             }
@@ -619,18 +669,31 @@
                 const quiz = quizzes.find(q => q.code === quizCode);
                 
                 if (!quiz) {
-                    showError('Kuis tidak ditemukan!', 'code-error');
+                    alert('Kuis tidak ditemukan!');
                     return;
                 }
                 
-                // Periksa apakah deadline sudah lewat
-                const now = new Date();
-                const deadline = new Date(quiz.deadline);
+                // Validasi input nama dan absen
+                const studentName = document.getElementById('student-name').value.trim();
+                const studentNumber = document.getElementById('student-number').value.trim();
                 
-                if (deadline < now) {
-                    showError('Batas waktu kuis sudah lewat!', 'code-error');
+                if (!studentName) {
+                    alert('Masukkan nama lengkap terlebih dahulu!');
                     return;
                 }
+                
+                if (!studentNumber || parseInt(studentNumber) <= 0) {
+                    alert('Masukkan nomor absen yang valid!');
+                    return;
+                }
+                
+                // Simpan data siswa
+                currentUser.name = studentName;
+                currentUser.number = studentNumber;
+                
+                // Tampilkan info siswa
+                document.getElementById('student-name-display').textContent = `${studentName} (${studentNumber})`;
+                document.getElementById('student-info').classList.remove('hidden');
                 
                 // Tampilkan kuis
                 document.getElementById('default-view').classList.add('hidden');
@@ -683,7 +746,7 @@
                     else if (question.type === 'short') {
                         questionContent = `
                             <div class="question-text">${index + 1}. ${question.question}</div>
-                            <input type="text" class="short-answer-input" placeholder="Masukkan jawaban singkat" data-correct-answer="${question.correctAnswer.toLowerCase()}">
+                            <input type="text" class="short-answer-input" placeholder="Masukkan jawaban singkat" data-correct-answer="${question.correctAnswer}">
                         `;
                     }
                     else {
@@ -763,8 +826,6 @@
                     const questionType = questionDiv.dataset.questionType;
                     const questionData = questions.find(q => q.id === questionId);
                     
-                    if (!questionData) return;
-                    
                     maxScore += questionData.points || 1;
                     
                     let studentAnswer = null;
@@ -787,10 +848,10 @@
                         }
                     } else if (questionType === 'short') {
                         const answerInput = questionDiv.querySelector('.short-answer-input');
-                        studentAnswer = answerInput.value.trim().toLowerCase();
-                        const correctAnswer = answerInput.dataset.correctAnswer;
+                        studentAnswer = answerInput.value.trim();
+                        const correctAnswer = answerInput.dataset.correctAnswer.toLowerCase();
                         
-                        if (studentAnswer === correctAnswer) {
+                        if (studentAnswer.toLowerCase() === correctAnswer) {
                             isCorrect = true;
                             correctCount++;
                             totalScore += questionData.points || 1;
@@ -827,6 +888,7 @@
                     quizTitle: quiz.title,
                     studentId: currentUser.id,
                     studentName: currentUser.name,
+                    studentNumber: currentUser.number,
                     timestamp: new Date().toISOString(),
                     answers: studentAnswers,
                     correct: correctCount,
@@ -857,6 +919,8 @@
                 
                 document.getElementById('result-quiz-code').textContent = quiz.code;
                 document.getElementById('result-quiz-title').textContent = quiz.title;
+                document.getElementById('result-student-name').textContent = currentUser.name;
+                document.getElementById('result-student-number').textContent = currentUser.number;
                 document.getElementById('result-correct').textContent = correct;
                 document.getElementById('result-wrong').textContent = wrong;
                 document.getElementById('result-total').textContent = `${score}/${total}`;
@@ -864,17 +928,6 @@
                 document.getElementById('final-score').textContent = `${Math.round((score / total) * 100)}%`;
                 
                 document.getElementById('quiz-result-modal').style.display = 'flex';
-            }
-
-            // Tampilkan error
-            function showError(message, elementId) {
-                const errorElement = document.getElementById(elementId);
-                errorElement.textContent = message;
-                errorElement.style.display = 'block';
-                
-                setTimeout(() => {
-                    errorElement.style.display = 'none';
-                }, 3000);
             }
 
             // Event listeners
@@ -889,26 +942,14 @@
             document.getElementById('join-quiz').addEventListener('click', function() {
                 const quizCode = document.getElementById('quiz-code').value.trim();
                 if (!quizCode) {
-                    showError('Masukkan kode kuis terlebih dahulu!', 'code-error');
+                    alert('Masukkan kode kuis terlebih dahulu!');
                     return;
                 }
                 
                 startQuiz(quizCode);
             });
             
-            document.getElementById('submit-quiz').addEventListener('click', function() {
-                // Validasi apakah semua pertanyaan telah dijawab
-                const unansweredQuestions = document.querySelectorAll('.question-container').length - 
-                    document.querySelectorAll('.option-item.selected, .short-answer-input:not(:empty), .essay-answer-input:not(:empty)').length;
-                
-                if (unansweredQuestions > 0) {
-                    if (!confirm(`Anda belum menjawab ${unansweredQuestions} pertanyaan. Yakin ingin mengirim?`)) {
-                        return;
-                    }
-                }
-                
-                submitQuiz();
-            });
+            document.getElementById('submit-quiz').addEventListener('click', submitQuiz);
             
             document.getElementById('close-result-modal').addEventListener('click', function() {
                 document.getElementById('quiz-result-modal').style.display = 'none';
