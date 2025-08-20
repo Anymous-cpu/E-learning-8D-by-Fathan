@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Credits | Murid</title>
+    <title>Credits | Guru</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap');
         
@@ -16,6 +16,7 @@
             --neon-glow: 0 0 10px var(--accent);
             --error: #ff6b6b;
             --success: #2ecc71;
+            --warning: #f39c12;
         }
         
         * {
@@ -30,26 +31,24 @@
             background: linear-gradient(135deg, #0a1a2e, #1a3a6a);
             min-height: 100vh;
             color: var(--light);
+            perspective: 1000px;
             touch-action: manipulation;
-            display: flex;
-            flex-direction: column;
         }
         
-        /* Navigation Bar */
         .navbar {
             background: var(--glass);
             backdrop-filter: blur(12px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.2);
             padding: 12px 15px;
+            display: flex;
+            flex-direction: column;
             position: fixed;
             width: 100%;
             top: 0;
             z-index: 100;
-            display: flex;
-            flex-direction: column;
         }
         
-        .nav-header {
+        .logo {
             display: flex;
             align-items: center;
             gap: 10px;
@@ -75,7 +74,7 @@
             font-size: 16px;
         }
         
-        .nav-tabs {
+        .nav-links {
             display: flex;
             overflow-x: auto;
             gap: 8px;
@@ -83,7 +82,7 @@
             -webkit-overflow-scrolling: touch;
         }
         
-        .nav-tab {
+        .nav-link {
             color: var(--light);
             text-decoration: none;
             font-size: 13px;
@@ -94,37 +93,63 @@
             background: rgba(255, 255, 255, 0.05);
         }
         
-        .nav-tab.active {
+        .nav-link.active {
             background: var(--primary);
             box-shadow: var(--neon-glow);
         }
         
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            margin-top: 110px;
-            padding: 20px 15px;
+        .container {
+            margin-top: 100px;
+            padding: 15px;
+            padding-bottom: 80px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            text-align: center;
         }
         
         .header-section {
             background: var(--glass);
             backdrop-filter: blur(12px);
             border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 25px;
+            padding: 15px;
+            margin-bottom: 20px;
             border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
             width: 100%;
             max-width: 500px;
-            text-align: center;
         }
         
-        .page-title {
-            font-size: 22px;
-            margin-bottom: 10px;
-            color: var(--accent);
+        h1 {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+        
+        .credits-list {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        .credit-item {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .credit-item:hover {
+            border-color: var(--primary);
+            box-shadow: 0 5px 15px rgba(93, 173, 236, 0.2);
         }
         
         .profile-img {
@@ -133,65 +158,28 @@
             border-radius: 50%;
             object-fit: cover;
             border: 3px solid var(--primary);
-            margin: 0 auto 15px;
-            box-shadow: 0 0 20px rgba(93, 173, 236, 0.5);
-        }
-        
-        .student-info {
-            margin-bottom: 20px;
-        }
-        
-        .student-name {
-            font-size: 18px;
-            font-weight: 500;
-            margin-bottom: 5px;
-        }
-        
-        .student-class {
-            font-size: 14px;
-            opacity: 0.8;
-        }
-        
-        .credits-section {
-            width: 100%;
-            max-width: 500px;
-        }
-        
-        .section-title {
-            font-size: 18px;
             margin-bottom: 15px;
-            color: var(--accent);
-            text-align: center;
-        }
-        
-        .credits-list {
-            background: var(--glass);
-            backdrop-filter: blur(12px);
-            border-radius: 12px;
-            padding: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .credit-item {
-            padding: 12px 0;
-            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
-        }
-        
-        .credit-item:last-child {
-            border-bottom: none;
+            box-shadow: 0 0 15px rgba(93, 173, 236, 0.5);
         }
         
         .credit-title {
             font-weight: 500;
+            margin-bottom: 10px;
+            color: var(--accent);
+            font-size: 18px;
+        }
+        
+        .credit-name {
+            font-size: 16px;
             margin-bottom: 5px;
         }
         
-        .credit-desc {
+        .credit-role {
             font-size: 14px;
             opacity: 0.8;
+            font-style: italic;
         }
         
-        /* Background Elements */
         .bg-elements {
             position: fixed;
             width: 100%;
@@ -207,12 +195,33 @@
             opacity: 0.1;
             filter: blur(30px);
         }
-        
-        /* Responsive */
+
+        /* Responsif */
         @media (max-width: 480px) {
+            .container {
+                margin-top: 90px;
+                padding: 12px;
+            }
+            
+            .header-section {
+                padding: 12px;
+            }
+            
+            .credit-item {
+                padding: 15px;
+            }
+            
             .profile-img {
                 width: 100px;
                 height: 100px;
+            }
+            
+            .credit-title {
+                font-size: 16px;
+            }
+            
+            .credit-name {
+                font-size: 14px;
             }
         }
     </style>
@@ -225,79 +234,70 @@
         <div class="bg-element" style="width: 200px; height: 200px; bottom: -30px; right: -30px;"></div>
     </div>
     
-    <!-- Navigation Bar -->
+    <!-- Navigation -->
     <nav class="navbar">
-        <div class="nav-header">
+        <div class="logo">
             <div class="logo-icon">👨‍🎓</div>
-            <span class="logo-text">CREDITS MURID</span>
+            <span class="logo-text">MURID KELAS 8D</span>
         </div>
-        <div class="nav-tabs">
-            <a href="dashboard.html" class="nav-tab">DASHBOARD</a>
-            <a href="kuis.html" class="nav-tab">KUIS</a>
-            <a href="tugas.html" class="nav-tab">TUGAS</a>
-            <a href="jadwal.html" class="nav-tab">JADWAL</a>
-            <a href="notifikasi.html" class="nav-tab">INFORMARSI</a>
-            <a href="credit-murid.html" class="nav-tab active">CREDITS</a>
+        <div class="nav-links">
+            <a href="dashboard.html" class="nav-link">DASHBOARD</a>
+            <a href="kuis.html" class="nav-link">KUIS</a>
+            <a href="jadwal.html" class="nav-link">JADWAL</a>
+            <a href="notifikasi.html" class="nav-link">INFORMASI</a>
+            <a href="credit-murid.html" class="nav-link active">CREDITS</a>
         </div>
     </nav>
     
     <!-- Main Content -->
-    <main class="main-content">
-        <div class="header-section">
-            <img src="https://files.catbox.moe/z4x47n.png" alt="Profile" class="profile-img" id="profile-pic">
-            <div class="student-info">
-                <div class="student-name" id="student-name">Nama Murid</div>
-                <div class="student-class">Kelas 8D</div>
-            </div>
-        </div>
+    <div class="container">
+        <section class="header-section">
+            <h1>SPECIAL THANKS TO</h1>
+            <p>Terima kasih kepada semua yang telah mendukung</p>
+        </section>
         
-        <div class="credits-section">
-            <h3 class="section-title">SPECIAL THANKS TO</h3>
-            <div class="credits-list">
-                <div class="credit-item">
-                    <div class="credit-title">KONDULAR</div>
-                    <div class="credit-desc">MY SUPPORT</div>
-                </div>
-                <div class="credit-item">
-                    <div class="credit-title">GITHUB</div>
-                    <div class="credit-desc">MY SUPPORT</div>
-                </div>
-                <div class="credit-item">
-                    <div class="credit-title">SHIIRO DEVELOPER</div>
-                    <div class="credit-desc">NAMA ASLINYA FATHAN</div>
-                </div>
+        <div class="credits-list">
+            <div class="credit-item">
+                <img src="https://files.catbox.moe/uksoyo.jpg" alt="Kondular" class="profile-img">
+                <div class="credit-title">SUPPORT SYSTEM</div>
+                <div class="credit-name">KONDULAR</div>
+                <div class="credit-role">MY SUPPORT</div>
+            </div>
+            
+            <div class="credit-item">
+                <img src="https://files.catbox.moe/aaxty2.jpg" alt="GitHub" class="profile-img">
+                <div class="credit-title">DEVELOPMENT</div>
+                <div class="credit-name">GITHUB</div>
+                <div class="credit-role">MY SUPPORT</div>
+            </div>
+            
+            <div class="credit-item">
+                <img src="https://files.catbox.moe/z4x47n.png" alt="Fathan/Shiiro" class="profile-img">
+                <div class="credit-title">DEVELOPER</div>
+                <div class="credit-name">FATHAN</div>
+                <div class="credit-role">ITS ME</div>
             </div>
         </div>
-    </main>
+    </div>
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Dynamic font sizing
+            // Ukuran font dinamis
             const baseFontSize = window.innerWidth < 400 ? 14 : 16;
             document.documentElement.style.fontSize = baseFontSize + 'px';
             
-            // Load student data
-            const studentName = localStorage.getItem('current_student') || 'Murid';
-            document.getElementById('student-name').textContent = studentName;
-            
-            // Load profile picture if available
-            const profilePic = localStorage.getItem('profile_pic');
-            if (profilePic) {
-                document.getElementById('profile-pic').src = profilePic;
-            }
-            
-            // Touch feedback for tabs
-            const tabs = document.querySelectorAll('.nav-tab');
-            tabs.forEach(tab => {
-                tab.addEventListener('touchstart', function() {
+            // Touch feedback untuk tombol
+            const buttons = document.querySelectorAll('.btn, .nav-link');
+            buttons.forEach(btn => {
+                btn.addEventListener('touchstart', function() {
                     this.style.transform = 'scale(0.95)';
                 });
-                tab.addEventListener('touchend', function() {
+                btn.addEventListener('touchend', function() {
                     this.style.transform = '';
                 });
             });
             
-            // Prevent zooming
+            // Mencegah zoom
             document.addEventListener('gesturestart', function(e) {
                 e.preventDefault();
             });
