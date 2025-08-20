@@ -168,6 +168,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 8px 0;
+            position: relative;
         }
         
         .submission-details {
@@ -358,77 +359,20 @@
             opacity: 0.8;
         }
 
-        /* Modal untuk detail jawaban */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background: var(--dark);
-            border-radius: 12px;
-            padding: 20px;
-            width: 90%;
-            max-width: 600px;
-            max-height: 80vh;
-            overflow-y: auto;
-            border: 1px solid var(--primary);
-            box-shadow: 0 0 20px rgba(93, 173, 236, 0.5);
-        }
-
-        .modal-header {
+        /* Student info in submission */
+        .student-info {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
+            gap: 15px;
+            margin-bottom: 5px;
+            font-size: 13px;
         }
 
-        .modal-title {
-            color: var(--accent);
-            font-size: 18px;
-        }
-
-        .close-modal {
-            background: none;
-            border: none;
-            color: var(--light);
-            font-size: 20px;
-            cursor: pointer;
-        }
-
-        .answer-detail {
-            margin-bottom: 15px;
-            padding-bottom: 15px;
-            border-bottom: 1px dashed rgba(255,255,255,0.1);
-        }
-
-        .answer-question {
+        .student-name {
             font-weight: 500;
-            margin-bottom: 8px;
         }
 
-        .answer-student {
-            font-style: italic;
-            margin-bottom: 8px;
+        .student-number {
             color: var(--accent);
-        }
-
-        .answer-correct {
-            color: var(--success);
-            margin-bottom: 5px;
-        }
-
-        .answer-wrong {
-            color: var(--error);
-            margin-bottom: 5px;
         }
 
         /* Perbaikan tata letak untuk mobile */
@@ -465,6 +409,11 @@
                 width: 100%;
                 justify-content: flex-end;
             }
+
+            .student-info {
+                flex-direction: column;
+                gap: 3px;
+            }
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -488,7 +437,7 @@
             <a href="create-kuis.html" class="nav-link">BUAT KUIS</a>
             <a href="pengumuman.html" class="nav-link">PENGUMUMAN</a>
             <a href="data-kuis.html" class="nav-link active">DATA KUIS</a>
-            <a href="credit-guru.html" class="nav-link">CREDITS</a>
+            <a href="credit-guru.html" class="nav-link">CREDIT</a>
         </div>
     </nav>
     
@@ -500,7 +449,7 @@
         </section>
         
         <div class="search-filter">
-            <input type="text" id="search-input" placeholder="Cari berdasarkan judul kuis atau nama murid...">
+            <input type="text" id="search-input" placeholder="Cari berdasarkan judul kuis, nama murid, atau nomor absen...">
         </div>
         
         <div class="bulk-actions">
@@ -521,37 +470,36 @@
             <h3 class="leaderboard-title"><i class="fas fa-trophy"></i> Peringkat Teratas</h3>
             <div id="top-students">
                 <!-- Data akan diisi oleh JavaScript -->
-                <div class="empty-state">
-                    <i class="fas fa-trophy" style="font-size: 30px; margin-bottom: 10px;"></i>
-                    <p>Belum ada data peringkat</p>
-                </div>
             </div>
         </div>
         
         <div class="quiz-list" id="submissions-container">
             <!-- Data hasil kuis akan dimuat di sini -->
-            <div class="empty-state">
-                <i class="fas fa-inbox" style="font-size: 40px; margin-bottom: 10px;"></i>
-                <p>Belum ada data hasil kuis yang dikumpulkan</p>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Modal untuk detail jawaban -->
-    <div class="modal" id="answer-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Detail Jawaban</h3>
-                <button class="close-modal" id="close-modal">&times;</button>
-            </div>
-            <div id="modal-content-details">
-                <!-- Detail jawaban akan diisi di sini -->
-            </div>
         </div>
     </div>
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Ukuran font dinamis
+            const baseFontSize = window.innerWidth < 400 ? 14 : 16;
+            document.documentElement.style.fontSize = baseFontSize + 'px';
+            
+            // Touch feedback untuk tombol
+            const buttons = document.querySelectorAll('.btn, .nav-link');
+            buttons.forEach(btn => {
+                btn.addEventListener('touchstart', function() {
+                    this.style.transform = 'scale(0.95)';
+                });
+                btn.addEventListener('touchend', function() {
+                    this.style.transform = '';
+                });
+            });
+            
+            // Mencegah zoom
+            document.addEventListener('gesturestart', function(e) {
+                e.preventDefault();
+            });
+
             // Ambil data hasil kuis dari localStorage
             function getQuizResults() {
                 return JSON.parse(localStorage.getItem('quiz_results')) || {};
@@ -569,7 +517,6 @@
                     results[quizId] = results[quizId].filter(sub => sub.timestamp !== submissionId);
                     localStorage.setItem('quiz_results', JSON.stringify(results));
                     renderSubmissions();
-                    renderLeaderboard();
                 }
             }
 
@@ -578,7 +525,6 @@
                 if (confirm('Apakah Anda yakin ingin menghapus semua data hasil kuis? Aksi ini tidak dapat dibatalkan.')) {
                     localStorage.removeItem('quiz_results');
                     renderSubmissions();
-                    renderLeaderboard();
                 }
             }
 
@@ -606,24 +552,18 @@
             }
 
             // Render leaderboard
-            function renderLeaderboard() {
-                const submissions = getQuizResults();
+            function renderLeaderboard(submissions) {
                 const topStudentsContainer = document.getElementById('top-students');
                 
                 const allResults = determineRankings(submissions);
                 
                 if (allResults.length === 0) {
-                    topStudentsContainer.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-trophy" style="font-size: 30px; margin-bottom: 10px;"></i>
-                            <p>Belum ada data peringkat</p>
-                        </div>
-                    `;
+                    topStudentsContainer.innerHTML = '<p class="no-results">Belum ada data peringkat</p>';
                     return;
                 }
                 
-                // Ambil top 3 siswa
-                const topStudents = allResults.slice(0, 3);
+                // Ambil top 5 siswa
+                const topStudents = allResults.slice(0, 5);
                 
                 topStudentsContainer.innerHTML = topStudents.map((student, index) => {
                     const percentage = Math.round((student.score / student.total) * 100);
@@ -637,7 +577,7 @@
                         <div class="leaderboard-item">
                             <div class="leaderboard-rank ${rankClass}">${index + 1}</div>
                             <div class="leaderboard-details">
-                                <div class="leaderboard-name">${student.studentName}</div>
+                                <div class="leaderboard-name">${student.studentName} (${student.studentNumber})</div>
                                 <div class="leaderboard-score">
                                     Skor: ${student.score}/${student.total} (${percentage}%) | 
                                     ${student.correct} Benar | ${student.wrong} Salah
@@ -648,83 +588,14 @@
                 }).join('');
             }
 
-            // Tampilkan detail jawaban
-            function showAnswerDetails(quizId, submissionId) {
-                const results = getQuizResults();
-                const quizzes = getTeacherQuizzes();
-                
-                const quizResults = results[quizId];
-                if (!quizResults) {
-                    alert('Data kuis tidak ditemukan!');
-                    return;
-                }
-                
-                const submission = quizResults.find(sub => sub.timestamp === submissionId);
-                if (!submission) {
-                    alert('Data pengumpulan tidak ditemukan!');
-                    return;
-                }
-                
-                const quiz = quizzes.find(q => q.id === quizId);
-                if (!quiz) {
-                    alert('Data kuis tidak ditemukan!');
-                    return;
-                }
-                
-                let detailsHtml = `
-                    <div style="background: var(--glass); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-                        <h3 style="margin-bottom: 10px;">${quiz.title}</h3>
-                        <p><strong>Murid:</strong> ${submission.studentName}</p>
-                        <p><strong>Skor:</strong> ${submission.score}/${submission.total} (${Math.round((submission.score / submission.total) * 100)}%)</p>
-                        <p><strong>Benar:</strong> <span class="correct">${submission.correct}</span> | <strong>Salah:</strong> <span class="incorrect">${submission.wrong}</span></p>
-                        <p><strong>Status:</strong> ${submission.status}</p>
-                        <p><strong>Dikumpulkan:</strong> ${new Date(submission.timestamp).toLocaleString()}</p>
-                    </div>
-                    
-                    <div style="margin-top: 20px;">
-                        <h4 style="margin-bottom: 15px;">Detail Jawaban:</h4>
-                `;
-                
-                // Gabungkan data pertanyaan dengan jawaban siswa
-                quiz.questions.forEach((question, index) => {
-                    const answerData = submission.answers.find(a => a.questionId === question.id) || {};
-                    
-                    detailsHtml += `
-                        <div class="answer-detail">
-                            <div class="answer-question"><strong>Pertanyaan ${index + 1}:</strong> ${question.question}</div>
-                            <div class="answer-student">Jawaban: ${answerData.answer || '-'}</div>
-                    `;
-                    
-                    if (question.type === 'multiple') {
-                        detailsHtml += `
-                            <div class="answer-correct">Jawaban benar: ${question.options[question.correctAnswer]}</div>
-                            <div>${answerData.isCorrect ? '✅ Benar' : '❌ Salah'}</div>
-                        `;
-                    } else if (question.type === 'short') {
-                        detailsHtml += `
-                            <div class="answer-correct">Jawaban yang diharapkan: ${question.correctAnswer}</div>
-                            <div>${answerData.isCorrect ? '✅ Benar' : '❌ Salah'}</div>
-                        `;
-                    } else {
-                        detailsHtml += `
-                            <div><em>(Soal essay memerlukan penilaian manual)</em></div>
-                        `;
-                    }
-                    
-                    detailsHtml += `</div>`;
-                });
-                
-                detailsHtml += `</div>`;
-                
-                document.getElementById('modal-content-details').innerHTML = detailsHtml;
-                document.getElementById('answer-modal').style.display = 'flex';
-            }
-
             // Render data submissions
             function renderSubmissions(filter = '') {
                 const results = getQuizResults();
                 const quizzes = getTeacherQuizzes();
                 const container = document.getElementById('submissions-container');
+                
+                // Render leaderboard terlebih dahulu
+                renderLeaderboard(results);
                 
                 if (Object.keys(results).length === 0) {
                     container.innerHTML = `
@@ -738,7 +609,6 @@
                 
                 // Kelompokkan submission berdasarkan quizId
                 let submissionsHtml = '';
-                let hasResults = false;
                 
                 // Loop melalui setiap kuis yang memiliki hasil
                 for (const [quizId, quizResults] of Object.entries(results)) {
@@ -752,12 +622,12 @@
                         const searchTerm = filter.toLowerCase();
                         return (
                             quiz.title.toLowerCase().includes(searchTerm) ||
-                            result.studentName.toLowerCase().includes(searchTerm)
+                            result.studentName.toLowerCase().includes(searchTerm) ||
+                            result.studentNumber.toString().includes(searchTerm)
                         );
                     });
                     
                     if (filteredResults.length === 0) continue;
-                    hasResults = true;
                     
                     // Urutkan hasil berdasarkan skor (descending)
                     filteredResults.sort((a, b) => {
@@ -768,9 +638,7 @@
                     
                     // Tambahkan badge juara untuk 3 teratas
                     filteredResults.forEach((result, index) => {
-                        if (index < 3) {
-                            result.rank = index + 1;
-                        }
+                        result.rank = index + 1;
                     });
                     
                     // Buat HTML untuk kuis ini
@@ -780,7 +648,6 @@
                             <div class="quiz-meta">
                                 <span><i class="fas fa-users"></i> ${filteredResults.length} Murid</span>
                                 <span><i class="fas fa-question-circle"></i> ${quiz.questions.length} Pertanyaan</span>
-                                <span><i class="fas fa-key"></i> ${quiz.code}</span>
                             </div>
                             
                             <div class="submission-info">
@@ -796,7 +663,10 @@
                                         <div class="submission-item">
                                             ${rankBadge}
                                             <div class="submission-details">
-                                                <div><strong>${result.studentName}</strong></div>
+                                                <div class="student-info">
+                                                    <span class="student-name"><strong>${result.studentName}</strong></span>
+                                                    <span class="student-number">Absen: ${result.studentNumber}</span>
+                                                </div>
                                                 <div>
                                                     Skor: <span class="score">${result.score}/${result.total}</span>
                                                     (${percentage}%) | 
@@ -827,7 +697,7 @@
                     `;
                 }
                 
-                if (!hasResults) {
+                if (submissionsHtml === '') {
                     container.innerHTML = `
                         <div class="no-results">
                             <i class="fas fa-search" style="font-size: 30px; margin-bottom: 10px;"></i>
@@ -843,7 +713,7 @@
                     btn.addEventListener('click', function() {
                         const quizId = this.getAttribute('data-quiz-id');
                         const submissionId = this.getAttribute('data-submission-id');
-                        showAnswerDetails(quizId, submissionId);
+                        showSubmissionDetails(quizId, submissionId);
                     });
                 });
                 
@@ -859,6 +729,124 @@
                 });
             }
 
+            // Tampilkan detail submission
+            function showSubmissionDetails(quizId, submissionId) {
+                const results = getQuizResults();
+                const quizzes = getTeacherQuizzes();
+                
+                const quizResults = results[quizId];
+                if (!quizResults) {
+                    alert('Data kuis tidak ditemukan!');
+                    return;
+                }
+                
+                const submission = quizResults.find(sub => sub.timestamp === submissionId);
+                if (!submission) {
+                    alert('Data pengumpulan tidak ditemukan!');
+                    return;
+                }
+                
+                const quiz = quizzes.find(q => q.id === quizId) || { questions: [] };
+                
+                let detailsHtml = `
+                    <div style="background: var(--glass); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                        <h3 style="margin-bottom: 10px;">${quiz.title}</h3>
+                        <p><strong>Murid:</strong> ${submission.studentName}</p>
+                        <p><strong>Nomor Absen:</strong> ${submission.studentNumber}</p>
+                        <p><strong>Skor:</strong> ${submission.score}/${submission.total} (${Math.round((submission.score / submission.total) * 100)}%)</p>
+                        <p><strong>Benar:</strong> <span class="correct">${submission.correct}</span> | <strong>Salah:</strong> <span class="incorrect">${submission.wrong}</span></p>
+                        <p><strong>Status:</strong> ${submission.status}</p>
+                        <p><strong>Dikumpulkan:</strong> ${new Date(submission.timestamp).toLocaleString()}</p>
+                    </div>
+                    
+                    <div style="margin-top: 20px;">
+                        <h4 style="margin-bottom: 15px;">Detail Jawaban:</h4>
+                `;
+                
+                quiz.questions.forEach((question, index) => {
+                    const studentAnswer = submission.answers.find(a => a.questionId === question.id);
+                    
+                    let answerHtml = '';
+                    let answerStatus = '';
+                    
+                    if (studentAnswer) {
+                        if (question.type === 'multiple') {
+                            const selectedOption = question.options[studentAnswer.answer];
+                            const correctOption = question.options[question.correctAnswer];
+                            
+                            answerHtml = `
+                                <p>Jawaban siswa: ${selectedOption || '(Tidak dijawab)'}</p>
+                                <p>Jawaban benar: <span class="correct">${correctOption}</span></p>
+                                <p>Status: ${studentAnswer.isCorrect ? '<span class="correct">Benar</span>' : '<span class="incorrect">Salah</span>'}</p>
+                            `;
+                        } else if (question.type === 'short') {
+                            answerHtml = `
+                                <p>Jawaban siswa: ${studentAnswer.answer || '(Tidak dijawab)'}</p>
+                                <p>Jawaban benar: ${question.correctAnswer}</p>
+                                <p>Status: ${studentAnswer.isCorrect ? '<span class="correct">Benar</span>' : '<span class="incorrect">Salah</span>'}</p>
+                            `;
+                        } else {
+                            answerHtml = `
+                                <p>Jawaban siswa: ${studentAnswer.answer || '(Tidak dijawab)'}</p>
+                                <p><em>(Soal essay memerlukan penilaian manual)</em></p>
+                            `;
+                        }
+                    } else {
+                        answerHtml = '<p>Siswa tidak menjawab pertanyaan ini</p>';
+                    }
+                    
+                    detailsHtml += `
+                        <div style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px dashed rgba(255,255,255,0.1);">
+                            <p><strong>Pertanyaan ${index + 1}:</strong> ${question.question}</p>
+                            ${answerHtml}
+                        </div>
+                    `;
+                });
+                
+                detailsHtml += `</div>`;
+                
+                // Tampilkan modal atau popup dengan detail
+                const modal = document.createElement('div');
+                modal.style.position = 'fixed';
+                modal.style.top = '0';
+                modal.style.left = '0';
+                modal.style.width = '100%';
+                modal.style.height = '100%';
+                modal.style.backgroundColor = 'rgba(0,0,0,0.8)';
+                modal.style.zIndex = '1000';
+                modal.style.display = 'flex';
+                modal.style.justifyContent = 'center';
+                modal.style.alignItems = 'center';
+                modal.style.padding = '20px';
+                modal.style.boxSizing = 'border-box';
+                
+                const modalContent = document.createElement('div');
+                modalContent.style.background = '#1a3a6a';
+                modalContent.style.borderRadius = '12px';
+                modalContent.style.padding = '20px';
+                modalContent.style.maxWidth = '600px';
+                modalContent.style.width = '100%';
+                modalContent.style.maxHeight = '80vh';
+                modalContent.style.overflowY = 'auto';
+                modalContent.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3>Detail Hasil Kuis</h3>
+                        <button id="close-modal" style="background: none; border: none; color: white; font-size: 20px; cursor: pointer;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    ${detailsHtml}
+                `;
+                
+                modal.appendChild(modalContent);
+                document.body.appendChild(modal);
+                
+                // Tambahkan event listener untuk tombol close
+                document.getElementById('close-modal').addEventListener('click', function() {
+                    document.body.removeChild(modal);
+                });
+            }
+
             // Event listener untuk pencarian
             document.getElementById('search-input').addEventListener('input', function() {
                 renderSubmissions(this.value);
@@ -867,20 +855,13 @@
             // Event listener untuk refresh data
             document.getElementById('refresh-data').addEventListener('click', function() {
                 renderSubmissions(document.getElementById('search-input').value);
-                renderLeaderboard();
             });
 
             // Event listener untuk hapus semua data
             document.getElementById('clear-all').addEventListener('click', clearAllSubmissions);
 
-            // Event listener untuk close modal
-            document.getElementById('close-modal').addEventListener('click', function() {
-                document.getElementById('answer-modal').style.display = 'none';
-            });
-
             // Inisialisasi render
             renderSubmissions();
-            renderLeaderboard();
         });
     </script>
 </body>
